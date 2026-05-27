@@ -1,0 +1,46 @@
+<div class="page container tracking-page fade-in">
+  @if (order(); as o) {
+    <h1 class="page-title">Track Order</h1>
+    <p class="order-ref">Order <strong>{{ o.id }}</strong></p>
+
+    <div class="timeline card">
+      @for (step of o.timeline; track step.status) {
+        <div class="timeline-step" [class.completed]="step.completed" [class.active]="step.active">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <strong>{{ step.label }}</strong>
+            @if (step.date) {
+              <span>{{ step.date }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="tracking-grid">
+      <div class="map-placeholder card">
+        <div class="map-visual">🗺️</div>
+        <p>Package location map (demo placeholder)</p>
+      </div>
+
+      <div class="tracking-info">
+        <div class="info-card card">
+          <h3>Shipment Info</h3>
+          <p><span>Tracking ID</span><strong>{{ o.trackingId }}</strong></p>
+          <p><span>Courier</span><strong>{{ o.courier }}</strong></p>
+          <p><span>ETA</span><strong>{{ o.deliveryEstimate }}</strong></p>
+        </div>
+        <div class="info-card card">
+          <h3>Delivery Address</h3>
+          <p>{{ o.address.name }}</p>
+          <p>{{ o.address.addressLine }}</p>
+          <p>{{ o.address.city }}, {{ o.address.state }} – {{ o.address.pincode }}</p>
+        </div>
+      </div>
+    </div>
+
+    <a routerLink="/orders" class="btn btn--secondary">← Back to Orders</a>
+  } @else {
+    <p>Order not found.</p>
+  }
+</div>

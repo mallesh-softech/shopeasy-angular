@@ -1,0 +1,80 @@
+.auth-layout {
+  display: grid;
+  min-height: 100vh;
+
+  @media (min-width: 992px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &__banner {
+    display: none;
+    position: relative;
+    background: linear-gradient(135deg, var(--color-navy) 0%, #134e4a 50%, var(--color-primary) 100%);
+    color: #fff;
+    overflow: hidden;
+
+    @media (min-width: 992px) {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 3rem;
+    }
+  }
+
+  &__banner-content {
+    position: relative;
+    z-index: 2;
+    max-width: 420px;
+
+    .auth-logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      display: inline-block;
+      color: #fff;
+
+      strong {
+        color: var(--color-primary-light);
+      }
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1rem;
+      opacity: 0.9;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+  }
+
+  &__banner-visual {
+    position: absolute;
+    inset: 0;
+    background: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80') center/cover;
+    opacity: 0.2;
+  }
+
+  .auth-features {
+    list-style: none;
+
+    li {
+      padding: 0.5rem 0;
+      font-size: 0.9375rem;
+      opacity: 0.95;
+    }
+  }
+
+  &__form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: var(--color-bg);
+  }
+}

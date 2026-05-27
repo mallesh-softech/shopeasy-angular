@@ -1,0 +1,91 @@
+<div class="page container payment-page fade-in">
+  <h1 class="page-title">Secure Payment</h1>
+
+  <div class="payment-layout">
+    <div class="payment-main">
+      <section class="card payment-section">
+        <h2>Select Payment Method</h2>
+        <div class="payment-methods">
+          @for (m of methods; track m.id) {
+            <button
+              type="button"
+              class="payment-method"
+              [class.selected]="paymentMethod() === m.id"
+              (click)="selectMethod(m.id)"
+            >
+              <span class="icon">{{ m.icon }}</span>
+              <span>{{ m.label }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      @if (paymentMethod() === 'card') {
+        <section class="card payment-section">
+          <h2>Card Details</h2>
+          <form [formGroup]="cardForm">
+            <div class="form-group">
+              <label>Card Number</label>
+              <input class="form-input" formControlName="cardNumber" placeholder="1234 5678 9012 3456" maxlength="16" />
+            </div>
+            <div class="form-group">
+              <label>Name on Card</label>
+              <input class="form-input" formControlName="name" />
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Expiry</label>
+                <input class="form-input" formControlName="expiry" placeholder="MM/YY" />
+              </div>
+              <div class="form-group">
+                <label>CVV</label>
+                <input class="form-input" type="password" formControlName="cvv" maxlength="4" />
+              </div>
+            </div>
+          </form>
+          <div class="secure-badge">🔒 Your payment is secured with 256-bit encryption</div>
+        </section>
+      }
+
+      @if (paymentMethod() === 'upi') {
+        <section class="card payment-section">
+          <h2>UPI Payment</h2>
+          <form [formGroup]="upiForm">
+            <div class="form-group">
+              <label>UPI ID</label>
+              <input class="form-input" formControlName="upiId" placeholder="yourname@upi" />
+            </div>
+          </form>
+          <div class="qr-placeholder">
+            <div class="qr-box">QR</div>
+            <p>Scan to pay with any UPI app</p>
+          </div>
+        </section>
+      }
+
+      @if (paymentMethod() === 'cod') {
+        <section class="card payment-section cod-info">
+          <p>💵 Pay when your order is delivered. An additional handling fee may apply.</p>
+        </section>
+      }
+
+      <button type="button" class="btn btn--primary btn--block btn--lg" [disabled]="processing()" (click)="pay()">
+        @if (processing()) {
+          <span class="spinner"></span> Processing...
+        } @else {
+          Pay {{ summary.total | currency: 'INR' : 'symbol' : '1.0-0' }}
+        }
+      </button>
+    </div>
+
+    <aside class="payment-summary card">
+      <h3>Amount Payable</h3>
+      <div class="summary-row"><span>Subtotal</span><span>{{ summary.subtotal | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+      @if (summary.discount) {
+        <div class="summary-row"><span>Discount</span><span>−{{ summary.discount | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+      }
+      <div class="summary-row"><span>Tax</span><span>{{ summary.tax | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+      <div class="summary-row total"><span>Total Payable</span><span>{{ summary.total | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+    </aside>
+  </div>
+</div>

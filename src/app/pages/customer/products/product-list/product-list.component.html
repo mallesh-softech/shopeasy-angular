@@ -1,0 +1,205 @@
+<div class="page container product-list-page fade-in">
+
+  <div class="list-layout">
+    <!-- Filters Sidebar -->
+    <aside class="filters-sidebar" [class.open]="sidebarOpen()">
+      <h3 class="filters-title">Filters</h3>
+
+      @for (section of dynamicSections; track section.key) {
+
+        <!-- Price section -->
+        @if (section.type === 'price') {
+          <div class="filter-section">
+            <div class="filter-section-header" (click)="toggleSection(section.key)">
+              <span>{{ section.label }}</span>
+              <span class="chevron" [class.open]="openSections[section.key]">›</span>
+            </div>
+            @if (openSections[section.key]) {
+              <div class="filter-section-body">
+                <div class="price-inputs">
+                  <input type="number" class="form-input price-in" placeholder="Min"
+                    [(ngModel)]="filters.minPrice" name="minPrice" />
+                  <span>to</span>
+                  <input type="number" class="form-input price-in" placeholder="Max"
+                    [(ngModel)]="filters.maxPrice" name="maxPrice" />
+                </div>
+                <button type="button" class="btn btn--primary btn--sm apply-btn" (click)="applyFilters()">Apply</button>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Rating section -->
+        @if (section.type === 'rating') {
+          <div class="filter-section">
+            <div class="filter-section-header" (click)="toggleSection(section.key)">
+              <span>{{ section.label }}</span>
+              <span class="chevron" [class.open]="openSections[section.key]">›</span>
+            </div>
+            @if (openSections[section.key]) {
+              <div class="filter-section-body">
+                <label class="filter-check">
+                  <input type="radio" name="rating" value="4"
+                    [checked]="filters.minRating === 4" (change)="setRating(4)" />
+                  4★ & above
+                </label>
+                <label class="filter-check">
+                  <input type="radio" name="rating" value="3"
+                    [checked]="filters.minRating === 3" (change)="setRating(3)" />
+                  3★ & above
+                </label>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Availability section -->
+        @if (section.type === 'availability') {
+          <div class="filter-section">
+            <div class="filter-section-header" (click)="toggleSection(section.key)">
+              <span>{{ section.label }}</span>
+              <span class="chevron" [class.open]="openSections[section.key]">›</span>
+            </div>
+            @if (openSections[section.key]) {
+              <div class="filter-section-body">
+                <label class="filter-check">
+                  <input type="checkbox" [(ngModel)]="filters.inStock" name="inStock"
+                    (ngModelChange)="applyFilters()" />
+                  In Stock Only
+                </label>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Brand section (uses filters.brand) -->
+        @if (section.type === 'checkbox' && section.key === 'brand') {
+          <div class="filter-section">
+            <div class="filter-section-header" (click)="toggleSection(section.key)">
+              <span>{{ section.label }}</span>
+              <span class="chevron" [class.open]="openSections[section.key]">›</span>
+            </div>
+            @if (openSections[section.key]) {
+              <div class="filter-section-body">
+                @for (opt of getSectionOptions(section); track opt.value) {
+                  <label class="filter-check">
+                    <input type="checkbox" [checked]="filters.brand === opt.value"
+                      (change)="toggleBrand(opt.value)" />
+                    {{ opt.label }}
+                  </label>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Generic checkbox sections (gender, discount, fabric, size, color, etc.) -->
+        @if (section.type === 'checkbox' && section.key !== 'brand') {
+          <div class="filter-section">
+            <div class="filter-section-header" (click)="toggleSection(section.key)">
+              <span>{{ section.label }}</span>
+              <span class="chevron" [class.open]="openSections[section.key]">›</span>
+            </div>
+            @if (openSections[section.key]) {
+              <div class="filter-section-body">
+                @for (opt of getSectionOptions(section); track opt.value) {
+                  <label class="filter-check">
+                    <input type="checkbox"
+                      [checked]="isExtraSelected(section.key, opt.value)"
+                      (change)="toggleExtra(section.key, opt.value)" />
+                    {{ opt.label }}
+                  </label>
+                }
+              </div>
+            }
+          </div>
+        }
+
+      }
+
+      <button type="button" class="btn btn--ghost btn--block clear-btn" (click)="clearFilters()">Clear All Filters</button>
+    </aside>
+
+    <!-- Right Column -->
+    <div class="list-content">
+
+      <button type="button" class="btn btn--secondary btn--sm filter-toggle" (click)="sidebarOpen.set(!sidebarOpen())">
+        ☰ Filters
+      </button>
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/">Home</a>
+        @if (breadcrumbCategory) {
+          <span class="sep">›</span>
+          <a [routerLink]="['/products']" [queryParams]="{ category: breadcrumbCategory }" class="crumb-link">
+            {{ breadcrumbCategory | titlecase }}
+          </a>
+        }
+        @if (filters.search) {
+          <span class="sep">›</span>
+          <span class="current">{{ filters.search }}</span>
+        } @else if (!breadcrumbCategory) {
+          <span class="sep">›</span>
+          <span class="current">All Products</span>
+        } @else {
+          <span class="sep">›</span>
+          <span class="current">All Products</span>
+        }
+      </nav>
+
+      <!-- Result count + Sort dropdown -->
+      <div class="result-row">
+        <p class="result-count">
+          Showing <strong>1 – {{ products().length }}</strong> of <strong>{{ products().length }}</strong> results
+          @if (filters.search) { for <strong>"{{ filters.search }}"</strong> }
+        </p>
+        <div class="sort-dropdown">
+          <label class="sort-label">Sort By</label>
+          <select class="sort-select" [(ngModel)]="filters.sort" name="sort" (ngModelChange)="applyFilters()">
+            @for (opt of sortOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Products grid -->
+      @if (loading()) {
+        <div class="products-grid">
+          @for (i of [1,2,3,4,5,6,7,8]; track i) {
+            <div class="skeleton-card">
+              <app-skeleton height="200px" />
+              <app-skeleton height="1rem" width="80%" />
+              <app-skeleton height="1rem" width="50%" />
+            </div>
+          }
+        </div>
+      } @else if (products().length === 0) {
+        <app-empty-state
+          icon="🔍"
+          title="No products found"
+          message="Try adjusting your filters or search terms."
+          actionLabel="Clear filters"
+          (action)="clearFilters()"
+        />
+      } @else {
+        <div class="products-grid">
+          @for (p of paginatedProducts(); track p.id) {
+            <app-product-card [product]="p" />
+          }
+        </div>
+
+        @if (totalPages() > 1) {
+          <nav class="pagination" aria-label="Pagination">
+            <button type="button" class="btn btn--ghost btn--sm" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">‹</button>
+            @for (page of pageNumbers(); track page) {
+              <button type="button" class="page-btn" [class.active]="currentPage() === page" (click)="goToPage(page)">{{ page }}</button>
+            }
+            <button type="button" class="btn btn--ghost btn--sm" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">›</button>
+          </nav>
+        }
+      }
+    </div>
+  </div>
+</div>

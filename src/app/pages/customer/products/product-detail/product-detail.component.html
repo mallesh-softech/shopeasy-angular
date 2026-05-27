@@ -1,0 +1,140 @@
+<div class="page container product-detail fade-in">
+  @if (loading()) {
+    <div class="detail-skeleton">
+      <app-skeleton height="400px" />
+      <app-skeleton height="300px" />
+    </div>
+  } @else if (product(); as p) {
+    <div class="detail-grid">
+      <div class="detail-gallery">
+        <div class="detail-gallery__main">
+          <img [src]="p.images[selectedImage()]" [alt]="p.title" class="main-image" />
+        </div>
+        <div class="detail-gallery__thumbs">
+          @for (img of p.images; track img; let i = $index) {
+            <button type="button" [class.active]="selectedImage() === i" (click)="selectedImage.set(i)">
+              <img [src]="img" [alt]="p.title + ' view ' + (i + 1)" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="detail-info">
+        <span class="detail-brand">{{ p.brand }}</span>
+        <h1>{{ p.title }}</h1>
+        <app-rating [rating]="p.rating" [count]="p.reviewCount" [showCount]="true" />
+
+        <div class="detail-price">
+          <span class="current">{{ p.price | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+          @if (p.originalPrice > p.price) {
+            <span class="original">{{ p.originalPrice | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+            <span class="discount-badge">{{ p.discount }}% off</span>
+          }
+        </div>
+
+        <p class="delivery-estimate">🚚 {{ p.deliveryEstimate }}</p>
+
+        @if (p.colors.length) {
+          <div class="option-group">
+            <label>Color</label>
+            <div class="color-swatches">
+              @for (color of p.colors; track color) {
+                <button
+                  type="button"
+                  class="swatch"
+                  [style.background]="color"
+                  [class.active]="selectedColor() === color"
+                  (click)="selectedColor.set(color)"
+                  [attr.aria-label]="'Color ' + color"
+                ></button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (p.sizes.length) {
+          <div class="option-group">
+            <label>Size</label>
+            <div class="size-options">
+              @for (size of p.sizes; track size) {
+                <button
+                  type="button"
+                  class="size-btn"
+                  [class.active]="selectedSize() === size"
+                  (click)="selectedSize.set(size)"
+                >
+                  {{ size }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="option-group">
+          <label>Quantity</label>
+          <div class="qty-selector">
+            <button type="button" (click)="decrementQty()">−</button>
+            <span>{{ quantity() }}</span>
+            <button type="button" (click)="incrementQty()">+</button>
+          </div>
+        </div>
+
+        @if (p.inStock) {
+          <span class="stock in-stock">✓ In Stock ({{ p.stockCount }} available)</span>
+        } @else {
+          <span class="stock out-of-stock">Out of Stock</span>
+        }
+
+        <div class="detail-actions">
+          <button type="button" class="btn btn--secondary btn--lg" (click)="addToCart()" [disabled]="!p.inStock">Add to Cart</button>
+          <button type="button" class="btn btn--accent btn--lg" (click)="buyNow()" [disabled]="!p.inStock">Buy Now</button>
+          <button type="button" class="btn btn--ghost wishlist-btn" (click)="toggleWishlist()">
+            {{ isWishlisted() ? '♥ Saved' : '♡ Wishlist' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-tabs">
+      <div class="tab-nav">
+        <button type="button" [class.active]="activeTab() === 'description'" (click)="activeTab.set('description')">Description</button>
+        <button type="button" [class.active]="activeTab() === 'specs'" (click)="activeTab.set('specs')">Specifications</button>
+        <button type="button" [class.active]="activeTab() === 'reviews'" (click)="activeTab.set('reviews')">Reviews</button>
+      </div>
+      <div class="tab-content card">
+        @switch (activeTab()) {
+          @case ('description') {
+            <p>{{ p.description }}</p>
+          }
+          @case ('specs') {
+            <table class="specs-table">
+              @for (entry of p.specifications | keyvalue; track entry.key) {
+                <tr>
+                  <th>{{ entry.key }}</th>
+                  <td>{{ entry.value }}</td>
+                </tr>
+              }
+            </table>
+          }
+          @case ('reviews') {
+            <div class="reviews-placeholder">
+              <app-rating [rating]="p.rating" [count]="p.reviewCount" [showCount]="true" />
+              <p>Customer reviews coming soon. Average rating based on {{ p.reviewCount }} reviews.</p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    @if (related().length) {
+      <section class="related-section">
+        <h2 class="section-title">Related Products</h2>
+        <div class="products-grid">
+          @for (r of related(); track r.id) {
+            <app-product-card [product]="r" />
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

@@ -1,0 +1,244 @@
+<div class="home fade-in">
+
+  <!-- HERO BANNER -->
+  @if (loading()) {
+    <section class="hero-skeleton container"><app-skeleton height="420px" /></section>
+  } @else {
+    <section class="hero">
+      @for (banner of banners(); track banner.id; let i = $index) {
+        <div class="hero__slide" [class.active]="activeBanner() === i"
+          [style.background-image]="'url(' + banner.image + ')'">
+          <div class="hero__overlay" [style.background]="banner.gradient"></div>
+          <div class="container hero__content">
+            <span class="hero__tag">🔥 Hot Deal</span>
+            <h1>{{ banner.title }}</h1>
+            <p>{{ banner.subtitle }}</p>
+            <div class="hero__btns">
+              <a routerLink="/products" class="btn btn--primary btn--lg">{{ banner.cta }}</a>
+              <a routerLink="/products" class="btn btn--ghost-white btn--lg">Browse All</a>
+            </div>
+          </div>
+        </div>
+      }
+      <div class="hero__dots">
+        @for (banner of banners(); track banner.id; let i = $index) {
+          <button type="button" [class.active]="activeBanner() === i" (click)="setBanner(i)"></button>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- SHOP BY CATEGORY -->
+  <section class="container section">
+    <div class="section-header">
+      <div>
+        <span class="section-eyebrow">Explore</span>
+        <h2 class="section-title">Shop by Category</h2>
+      </div>
+      <a routerLink="/products" class="view-all">View all →</a>
+    </div>
+    <div class="categories-grid">
+      @for (cat of categories(); track cat.id) {
+        <a [routerLink]="['/products']" [queryParams]="{ category: cat.id }" class="category-card">
+          <img [src]="cat.image" [alt]="cat.name" loading="lazy" />
+          <span class="category-card__icon">{{ cat.icon }}</span>
+          <span class="category-card__name">{{ cat.name }}</span>
+        </a>
+      }
+      @for (cat of extraCategories; track cat.id) {
+        <a [routerLink]="['/products']" [queryParams]="{ category: cat.id }" class="category-tile">
+          <span class="category-tile__icon">{{ cat.icon }}</span>
+          <span class="category-tile__name">{{ cat.name }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- DEALS OF THE DAY -->
+  <section class="deals-section">
+    <div class="container">
+      <div class="deals-header">
+        <div>
+          <span class="section-eyebrow">Limited Time</span>
+          <h2 class="section-title" style="color:#fff">⚡ Deals of the Day</h2>
+        </div>
+        <div class="countdown">
+          <div class="countdown__block"><span class="countdown__num">{{ pad(dealHours()) }}</span><span class="countdown__label">Hrs</span></div>
+          <span class="countdown__sep">:</span>
+          <div class="countdown__block"><span class="countdown__num">{{ pad(dealMins()) }}</span><span class="countdown__label">Min</span></div>
+          <span class="countdown__sep">:</span>
+          <div class="countdown__block"><span class="countdown__num">{{ pad(dealSecs()) }}</span><span class="countdown__label">Sec</span></div>
+        </div>
+      </div>
+      @if (trending().length) {
+        <div class="deals-scroll">
+          @for (p of trending(); track p.id) {
+            <div class="deal-card">
+              <a [routerLink]="['/products', p.id]" class="deal-card__img-wrap">
+                <img [src]="p.image" [alt]="p.title" loading="lazy" />
+                @if (p.discount > 0) {
+                  <span class="deal-card__badge">{{ p.discount }}% OFF</span>
+                }
+                <button type="button" class="deal-card__wish" [class.active]="isWishlisted(p.id)" (click)="toggleWishlist($event, p)">
+                  {{ isWishlisted(p.id) ? '♥' : '♡' }}
+                </button>
+              </a>
+              <div class="deal-card__body">
+                <p class="deal-card__brand">{{ p.brand }}</p>
+                <p class="deal-card__title">{{ p.title }}</p>
+                <div class="deal-card__price">
+                  <span class="deal-card__price--current">{{ p.price | currency:'INR':'symbol':'1.0-0' }}</span>
+                  @if (p.originalPrice > p.price) {
+                    <span class="deal-card__price--original">{{ p.originalPrice | currency:'INR':'symbol':'1.0-0' }}</span>
+                  }
+                </div>
+                <button type="button" class="btn btn--primary btn--sm deal-card__add" (click)="addToCart($event, p)">Add to Cart</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- TRENDING PRODUCTS -->
+  @if (featured().length) {
+    <section class="container section">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow">What's Hot</span>
+          <h2 class="section-title">Trending Products</h2>
+        </div>
+        <a routerLink="/products" class="view-all">View all →</a>
+      </div>
+      <div class="products-grid">
+        @for (p of featured(); track p.id) {
+          <app-product-card [product]="p" />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- PROMO BANNER -->
+  <section class="promo-banner container">
+    <div class="promo-card">
+      <div>
+        <span class="promo-badge">Limited Time</span>
+        <h3>Extra 20% Off on Electronics</h3>
+        <p>Use code <strong>SAVE10</strong> at checkout</p>
+      </div>
+      <a routerLink="/products" [queryParams]="{ category: 'electronics' }" class="btn btn--accent">Shop Deals</a>
+    </div>
+  </section>
+
+  <!-- TOP BRANDS -->
+  <section class="section section--tinted">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow">Premium</span>
+          <h2 class="section-title">Top Brands</h2>
+        </div>
+        <a routerLink="/products" class="view-all">View all →</a>
+      </div>
+      <div class="brands-row">
+        @for (brand of brands; track brand.name) {
+          <a [routerLink]="['/products']" [queryParams]="{ brand: brand.name }" class="brand-card">
+            <span class="brand-card__emoji">{{ brand.emoji }}</span>
+            <span class="brand-card__name">{{ brand.name }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW ARRIVALS -->
+  @if (newArrivals().length) {
+    <section class="container section">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow">Just In</span>
+          <h2 class="section-title">New Arrivals</h2>
+        </div>
+        <a routerLink="/products" class="view-all">View all →</a>
+      </div>
+      <div class="products-grid">
+        @for (p of newArrivals(); track p.id) {
+          <app-product-card [product]="p" />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- SHOP BY LIFESTYLE -->
+  <section class="section section--dark">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow" style="color:rgba(255,255,255,0.6)">Curated For You</span>
+          <h2 class="section-title" style="color:#fff">Shop by Lifestyle</h2>
+        </div>
+      </div>
+      <div class="lifestyle-grid">
+        @for (ls of lifestyles; track ls.title) {
+          <a routerLink="/products" class="lifestyle-card" [style.background]="ls.bg">
+            <span class="lifestyle-card__emoji">{{ ls.emoji }}</span>
+            <h3>{{ ls.title }}</h3>
+            <p>{{ ls.sub }}</p>
+            <span class="lifestyle-card__cta">Explore →</span>
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- BEST SELLERS -->
+  @if (bestSellers().length) {
+    <section class="container section">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow">Customer Favourites</span>
+          <h2 class="section-title">Best Sellers</h2>
+        </div>
+        <a routerLink="/products" class="view-all">View all →</a>
+      </div>
+      <div class="products-grid">
+        @for (p of bestSellers(); track p.id) {
+          <app-product-card [product]="p" />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- RECENTLY VIEWED -->
+  @if (recentlyViewed().length) {
+    <section class="container section">
+      <div class="section-header">
+        <div>
+          <span class="section-eyebrow">Your History</span>
+          <h2 class="section-title">Recently Viewed</h2>
+        </div>
+      </div>
+      <div class="products-grid">
+        @for (p of recentlyViewed(); track p.id) {
+          <app-product-card [product]="p" [compact]="true" />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- NEWSLETTER -->
+  <section class="newsletter-section">
+    <div class="container newsletter-inner">
+      <div>
+        <h2>Stay in the Loop 📬</h2>
+        <p>Subscribe for exclusive deals, new arrivals & style inspiration.</p>
+      </div>
+      <form class="newsletter-form" (ngSubmit)="$event.preventDefault()">
+        <input type="email" placeholder="Enter your email address" class="newsletter-input" />
+        <button type="submit" class="btn btn--primary">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
+</div>

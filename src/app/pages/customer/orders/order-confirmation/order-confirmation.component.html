@@ -1,0 +1,24 @@
+<div class="page container confirmation-page fade-in">
+  @if (order(); as o) {
+    <div class="success-card">
+      <div class="success-icon">✓</div>
+      <h1>Order Confirmed!</h1>
+      <p>Thank you for shopping with ShopEasy. Your order has been placed successfully.</p>
+
+      <div class="order-details card">
+        <div class="detail-row"><span>Order ID</span><strong>{{ o.id }}</strong></div>
+        <div class="detail-row"><span>Date</span><span>{{ o.createdAt | date: 'medium' }}</span></div>
+        <div class="detail-row"><span>Total</span><strong>{{ o.total | currency: 'INR' : 'symbol' : '1.0-0' }}</strong></div>
+        <div class="detail-row"><span>Delivery</span><span>{{ o.deliveryEstimate }}</span></div>
+      </div>
+
+      <div class="actions">
+        <a [routerLink]="['/orders/track', o.id]" class="btn btn--primary btn--lg">Track Order</a>
+        <a routerLink="/" class="btn btn--secondary btn--lg">Continue Shopping</a>
+        <button type="button" class="btn btn--ghost" disabled>Download Invoice</button>
+      </div>
+    </div>
+  } @else {
+    <p>Order not found. <a routerLink="/orders">View orders</a></p>
+  }
+</div>

@@ -1,0 +1,77 @@
+.confirmation-page {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+
+  .success-card {
+    text-align: center;
+    max-width: 520px;
+    width: 100%;
+  }
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: scaleIn 0.5s ease;
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-navy);
+    margin-bottom: 0.5rem;
+  }
+
+  > .success-card > p {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .order-details {
+    text-align: left;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.9rem;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span:first-child {
+        color: var(--color-text-muted);
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,189 @@
+<div class="page container profile-page fade-in">
+  <h1 class="page-title">My Account</h1>
+
+  <div class="profile-layout">
+    <aside class="profile-sidebar card">
+      @if (user(); as u) {
+        <div class="profile-sidebar__user">
+          <img [src]="u.avatar" [alt]="u.fullName" class="avatar-lg" />
+          <strong>{{ u.fullName }}</strong>
+          <span>{{ u.email }}</span>
+        </div>
+      }
+      <nav>
+        <button type="button" [class.active]="activeTab() === 'profile'" (click)="activeTab.set('profile')">Profile Info</button>
+        <button type="button" [class.active]="activeTab() === 'addresses'" (click)="activeTab.set('addresses')">Addresses</button>
+        <button type="button" [class.active]="activeTab() === 'security'" (click)="activeTab.set('security')">Security</button>
+        <button type="button" [class.active]="activeTab() === 'settings'" (click)="activeTab.set('settings')">Notifications</button>
+      </nav>
+    </aside>
+
+    <div class="profile-content">
+      @if (activeTab() === 'profile') {
+        <section class="card profile-section">
+          <h2>Personal Information</h2>
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input class="form-input" formControlName="fullName" />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input class="form-input" formControlName="email" />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input class="form-input" formControlName="phone" />
+            </div>
+            <button type="submit" class="btn btn--primary">Save Changes</button>
+          </form>
+        </section>
+      }
+
+      @if (activeTab() === 'addresses') {
+        <section class="card profile-section">
+          <h2>Saved Addresses</h2>
+          <div class="addresses-grid">
+            @for (addr of addresses(); track addr.id) {
+              <div class="address-card-item">
+                <div class="address-header">
+                  <span class="badge badge--info">{{ addr.label }}</span>
+                  @if (addr.isDefault) {
+                    <span class="default-tag">Default</span>
+                  }
+                </div>
+                <p><strong>{{ addr.name }}</strong></p>
+                <p>{{ addr.addressLine }}</p>
+                <p>{{ addr.city }}, {{ addr.state }} – {{ addr.pincode }}</p>
+                <p class="phone">{{ addr.phone }}</p>
+                <div class="address-actions">
+                  <button type="button" class="btn btn--ghost btn--sm">Edit</button>
+                  <button type="button" class="btn btn--ghost btn--sm">Delete</button>
+                </div>
+              </div>
+            }
+            <button type="button" class="add-address-card" (click)="openAddressModal()">
+              <span>+</span>
+              <span>Add New Address</span>
+            </button>
+          </div>
+        </section>
+      }
+
+      @if (activeTab() === 'security') {
+        <section class="card profile-section">
+          <h2>Change Password</h2>
+          <form [formGroup]="securityForm" (ngSubmit)="changePassword()">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" class="form-input" formControlName="currentPassword" />
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" class="form-input" formControlName="newPassword" />
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" class="form-input" formControlName="confirmPassword" />
+            </div>
+            <button type="submit" class="btn btn--primary">Update Password</button>
+          </form>
+          <div class="payment-placeholder">
+            <h3>Saved Cards</h3>
+            <p class="muted">Card management coming soon (demo placeholder)</p>
+          </div>
+        </section>
+      }
+
+      @if (activeTab() === 'settings') {
+        <section class="card profile-section">
+          <h2>Notification Preferences</h2>
+          <label class="setting-row">
+            <span>Email notifications</span>
+            <input type="checkbox" [(ngModel)]="settings.emailNotifications" />
+          </label>
+          <label class="setting-row">
+            <span>SMS notifications</span>
+            <input type="checkbox" [(ngModel)]="settings.smsNotifications" />
+          </label>
+          <label class="setting-row">
+            <span>Order updates</span>
+            <input type="checkbox" [(ngModel)]="settings.orderUpdates" />
+          </label>
+          <label class="setting-row">
+            <span>Promotional offers</span>
+            <input type="checkbox" [(ngModel)]="settings.promotions" />
+          </label>
+        </section>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- ADD ADDRESS MODAL -->
+@if (showAddressModal()) {
+  <div class="modal-overlay" (click)="closeAddressModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3>Add New Address</h3>
+        <button type="button" class="modal__close" (click)="closeAddressModal()">✕</button>
+      </div>
+      <form [formGroup]="addressModalForm" (ngSubmit)="saveAddress()" class="modal__body">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input class="form-input" formControlName="name" placeholder="Enter full name" />
+            @if (addressModalForm.get('name')?.invalid && addressModalForm.get('name')?.touched) {
+              <span class="error">Name is required</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Phone *</label>
+            <input class="form-input" formControlName="phone" placeholder="+91 XXXXX XXXXX" />
+            @if (addressModalForm.get('phone')?.invalid && addressModalForm.get('phone')?.touched) {
+              <span class="error">Phone is required</span>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Address Line *</label>
+          <input class="form-input" formControlName="addressLine" placeholder="House no, Street, Area" />
+          @if (addressModalForm.get('addressLine')?.invalid && addressModalForm.get('addressLine')?.touched) {
+            <span class="error">Address is required</span>
+          }
+        </div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>City *</label>
+            <input class="form-input" formControlName="city" placeholder="City" />
+          </div>
+          <div class="form-group">
+            <label>State *</label>
+            <input class="form-input" formControlName="state" placeholder="State" />
+          </div>
+          <div class="form-group">
+            <label>Pincode *</label>
+            <input class="form-input" formControlName="pincode" placeholder="6-digit" maxlength="6" />
+            @if (addressModalForm.get('pincode')?.invalid && addressModalForm.get('pincode')?.touched) {
+              <span class="error">Valid 6-digit pincode required</span>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Address Type</label>
+          <div class="addr-type-btns">
+            @for (type of ['Home','Work','Other']; track type) {
+              <button type="button" class="addr-type-btn"
+                [class.active]="addressModalForm.get('label')?.value === type"
+                (click)="setAddrLabel(type)">{{ type }}</button>
+            }
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--secondary" (click)="closeAddressModal()">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

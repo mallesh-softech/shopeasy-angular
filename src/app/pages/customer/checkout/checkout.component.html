@@ -1,0 +1,184 @@
+<div class="page container checkout-page fade-in">
+  <h1 class="page-title">Checkout</h1>
+
+  <div class="stepper">
+    <div class="step" [class.active]="step() >= 1" [class.done]="step() > 1"><span>1</span> Shipping</div>
+    <div class="step-line" [class.done]="step() > 1"></div>
+    <div class="step" [class.active]="step() >= 2" [class.done]="step() > 2"><span>2</span> Summary</div>
+    <div class="step-line" [class.done]="step() > 2"></div>
+    <div class="step" [class.active]="step() >= 3"><span>3</span> Review</div>
+  </div>
+
+  <div class="checkout-layout">
+    <div class="checkout-main">
+
+      <!-- STEP 1: SHIPPING -->
+      @if (step() === 1) {
+        <section class="card checkout-section">
+          <h2>Shipping Address</h2>
+
+          <div class="saved-addresses">
+            @for (addr of addresses(); track addr.id) {
+              <label class="address-card" [class.selected]="selectedAddressId() === addr.id">
+                <input type="radio" name="address" [value]="addr.id"
+                  [checked]="selectedAddressId() === addr.id"
+                  (change)="selectAddress(addr.id)" />
+                <div class="address-card__info">
+                  <div class="address-card__top">
+                    <span class="addr-label">{{ addr.label }}</span>
+                    @if (addr.isDefault) { <span class="addr-default">Default</span> }
+                  </div>
+                  <strong>{{ addr.name }}</strong>
+                  <p>{{ addr.phone }}</p>
+                  <p>{{ addr.addressLine }}, {{ addr.city }}, {{ addr.state }} – {{ addr.pincode }}</p>
+                </div>
+              </label>
+            }
+
+            <!-- ADD NEW ADDRESS BUTTON -->
+            <button type="button" class="add-address-btn" (click)="openModal()">
+              <span class="add-address-btn__plus">+</span>
+              <span>Add New Address</span>
+            </button>
+          </div>
+
+          <!-- EXPRESS DELIVERY CHECKBOX -->
+          <div class="express-delivery">
+            <label class="express-label" [class.checked]="expressDelivery()">
+              <input type="checkbox" [checked]="expressDelivery()"
+                (change)="expressDelivery.set(!expressDelivery())" />
+              <div class="express-label__body">
+                <span class="express-label__title">⚡ Express Delivery</span>
+                <span class="express-label__sub">1–2 business days · ₹99 extra</span>
+              </div>
+            </label>
+          </div>
+        </section>
+      }
+
+      <!-- STEP 2: ORDER SUMMARY -->
+      @if (step() === 2) {
+        <section class="card checkout-section">
+          <h2>Order Summary</h2>
+          @for (item of cart.items(); track item.product.id) {
+            <div class="checkout-item">
+              <img [src]="item.product.image" [alt]="item.product.title" />
+              <div>
+                <strong>{{ item.product.title }}</strong>
+                <span>Qty: {{ item.quantity }}</span>
+              </div>
+              <span>{{ item.product.price * item.quantity | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- STEP 3: REVIEW -->
+      @if (step() === 3) {
+        <section class="card checkout-section">
+          <h2>Review Order</h2>
+          @if (getSelectedAddress(); as addr) {
+            <div class="review-block">
+              <h4>Delivery Address</h4>
+              <p>{{ addr.name }}, {{ addr.phone }}</p>
+              <p>{{ addr.addressLine }}, {{ addr.city }}, {{ addr.pincode }}</p>
+            </div>
+          }
+          <div class="review-block">
+            <h4>Delivery Type</h4>
+            <p>{{ expressDelivery() ? 'Express (1–2 days) · ₹99' : 'Standard (5–7 days) · FREE' }}</p>
+          </div>
+        </section>
+      }
+
+      <div class="checkout-nav">
+        @if (step() > 1) {
+          <button type="button" class="btn btn--secondary" (click)="prevStep()">Back</button>
+        }
+        <button type="button" class="btn btn--primary" (click)="nextStep()">
+          {{ step() === 3 ? 'Continue to Payment' : 'Continue' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ORDER SUMMARY SIDEBAR -->
+    <aside class="order-summary card">
+      <h3>Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span>{{ summary.subtotal | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+      <div class="summary-row"><span>Delivery</span><span>{{ expressDelivery() ? '₹99' : 'FREE' }}</span></div>
+      <div class="summary-row"><span>Tax</span><span>{{ summary.tax | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>{{ (summary.subtotal + summary.tax + (expressDelivery() ? 99 : 0)) | currency: 'INR' : 'symbol' : '1.0-0' }}</span></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ADD ADDRESS MODAL -->
+@if (showAddressModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal__header">
+        <h3>Add New Address</h3>
+        <button type="button" class="modal__close" (click)="closeModal()">✕</button>
+      </div>
+      <form [formGroup]="modalForm" (ngSubmit)="saveModalAddress()" class="modal__body">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input class="form-input" formControlName="name" placeholder="Enter full name" />
+            @if (modalForm.get('name')?.invalid && modalForm.get('name')?.touched) {
+              <span class="error">Name is required</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Phone *</label>
+            <input class="form-input" formControlName="phone" placeholder="+91 XXXXX XXXXX" />
+            @if (modalForm.get('phone')?.invalid && modalForm.get('phone')?.touched) {
+              <span class="error">Phone is required</span>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Address Line *</label>
+          <input class="form-input" formControlName="addressLine" placeholder="House no, Street, Area" />
+          @if (modalForm.get('addressLine')?.invalid && modalForm.get('addressLine')?.touched) {
+            <span class="error">Address is required</span>
+          }
+        </div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label>City *</label>
+            <input class="form-input" formControlName="city" placeholder="City" />
+          </div>
+          <div class="form-group">
+            <label>State *</label>
+            <input class="form-input" formControlName="state" placeholder="State" />
+          </div>
+          <div class="form-group">
+            <label>Pincode *</label>
+            <input class="form-input" formControlName="pincode" placeholder="6-digit pincode" maxlength="6" />
+            @if (modalForm.get('pincode')?.invalid && modalForm.get('pincode')?.touched) {
+              <span class="error">Valid 6-digit pincode required</span>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Address Type</label>
+          <div class="addr-type-btns">
+            @for (type of ['Home','Work','Other']; track type) {
+              <button type="button"
+                class="addr-type-btn"
+                [class.active]="modalForm.get('label')?.value === type"
+                (click)="setAddressLabel(type)">
+                {{ type }}
+              </button>
+            }
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

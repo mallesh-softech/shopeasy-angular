@@ -1,0 +1,36 @@
+<article class="product-card" [class.compact]="compact()">
+  <a [routerLink]="['/products', product().id]" class="product-card__link">
+    <div class="product-card__image-wrap">
+      <img [src]="product().image" [alt]="product().title" loading="lazy" />
+      @if (product().discount > 0) {
+        <span class="product-card__discount">-{{ product().discount }}%</span>
+      }
+      <button
+        type="button"
+        class="product-card__wishlist"
+        [class.active]="isWishlisted()"
+        (click)="toggleWishlist($event)"
+        [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
+      >
+        {{ isWishlisted() ? '♥' : '♡' }}
+      </button>
+    </div>
+    <div class="product-card__body">
+      <span class="product-card__brand">{{ product().brand }}</span>
+      <h3 class="product-card__title">{{ product().title }}</h3>
+      <app-rating [rating]="product().rating" [count]="product().reviewCount" [showCount]="true" />
+      <div class="product-card__price">
+        <span class="current">{{ product().price | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+        @if (product().originalPrice > product().price) {
+          <span class="original">{{ product().originalPrice | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+        }
+      </div>
+      @if (!product().inStock) {
+        <span class="product-card__stock out">Out of stock</span>
+      } @else if (product().stockCount < 10) {
+        <span class="product-card__stock low">Only {{ product().stockCount }} left</span>
+      }
+      <button type="button" class="btn btn--primary btn--sm product-card__add-btn" (click)="addToCart($event)">Add to Cart</button>
+    </div>
+  </a>
+</article>

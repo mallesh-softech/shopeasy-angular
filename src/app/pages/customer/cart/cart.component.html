@@ -1,0 +1,81 @@
+<div class="page container cart-page fade-in">
+  <h1 class="page-title">Shopping Cart</h1>
+
+  @if (cart.items().length === 0) {
+    <app-empty-state
+      icon="🛒"
+      title="Your cart is empty"
+      message="Looks like you haven't added anything yet."
+      actionLabel="Continue Shopping"
+      (action)="null"
+    />
+    <div class="empty-action">
+      <a routerLink="/products" class="btn btn--primary">Browse Products</a>
+    </div>
+  } @else {
+    <div class="cart-layout">
+      <div class="cart-items">
+        @for (item of cart.items(); track item.product.id + (item.selectedSize || '') + (item.selectedColor || '')) {
+          <article class="cart-item card">
+            <img [src]="item.product.image" [alt]="item.product.title" class="cart-item__img" />
+            <div class="cart-item__info">
+              <a [routerLink]="['/products', item.product.id]" class="cart-item__title">{{ item.product.title }}</a>
+              <span class="cart-item__brand">{{ item.product.brand }}</span>
+              @if (item.selectedSize || item.selectedColor) {
+                <span class="cart-item__variant">
+                  @if (item.selectedSize) { Size: {{ item.selectedSize }} }
+                  @if (item.selectedColor) { Color: <span class="color-dot" [style.background]="item.selectedColor"></span> }
+                </span>
+              }
+              <span class="cart-item__price">{{ item.product.price | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+            </div>
+            <div class="cart-item__actions">
+              <div class="qty-selector">
+                <button type="button" (click)="cart.updateQuantity(item.product.id, item.quantity - 1, item.selectedColor, item.selectedSize)">−</button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" (click)="cart.updateQuantity(item.product.id, item.quantity + 1, item.selectedColor, item.selectedSize)">+</button>
+              </div>
+              <button type="button" class="btn btn--ghost btn--sm" (click)="cart.saveForLater(item)">Save for later</button>
+              <button type="button" class="btn btn--ghost btn--sm remove" (click)="cart.removeItem(item.product.id, item.selectedColor, item.selectedSize)">Remove</button>
+            </div>
+            <div class="cart-item__total">
+              {{ item.product.price * item.quantity | currency: 'INR' : 'symbol' : '1.0-0' }}
+            </div>
+          </article>
+        }
+      </div>
+
+      <aside class="order-summary card">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal ({{ cart.summary().itemCount }} items)</span>
+          <span>{{ cart.summary().subtotal | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+        </div>
+        @if (cart.summary().discount > 0) {
+          <div class="summary-row discount">
+            <span>Discount</span>
+            <span>−{{ cart.summary().discount | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+          </div>
+        }
+        <div class="summary-row">
+          <span>Delivery</span>
+          <span>{{ cart.summary().deliveryFee === 0 ? 'FREE' : (cart.summary().deliveryFee | currency: 'INR' : 'symbol' : '1.0-0') }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax (18% GST)</span>
+          <span>{{ cart.summary().tax | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+        </div>
+        <div class="coupon-form">
+          <input type="text" class="form-input" [(ngModel)]="couponInput" placeholder="Coupon code (SAVE10)" />
+          <button type="button" class="btn btn--secondary btn--sm" (click)="applyCoupon()">Apply</button>
+        </div>
+        <div class="summary-row total">
+          <span>Grand Total</span>
+          <span>{{ cart.summary().total | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+        </div>
+        <a routerLink="/checkout" class="btn btn--primary btn--block btn--lg">Proceed to Checkout</a>
+        <a routerLink="/products" class="btn btn--ghost btn--block">Continue Shopping</a>
+      </aside>
+    </div>
+  }
+</div>

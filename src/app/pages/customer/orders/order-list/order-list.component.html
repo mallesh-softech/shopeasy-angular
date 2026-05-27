@@ -1,0 +1,46 @@
+<div class="page container orders-page fade-in">
+  <h1 class="page-title">My Orders</h1>
+
+  <div class="order-tabs">
+    @for (tab of tabs; track tab.id) {
+      <button type="button" class="tab-btn" [class.active]="activeTab() === tab.id" (click)="setTab(tab.id)">
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  @if (filteredOrders().length === 0) {
+    <app-empty-state
+      icon="📦"
+      title="No orders yet"
+      message="When you place an order, it will appear here."
+      actionLabel="Start Shopping"
+    />
+    <div class="empty-action"><a routerLink="/products" class="btn btn--primary">Browse Products</a></div>
+  } @else {
+    <div class="orders-list">
+      @for (order of filteredOrders(); track order.id) {
+        @if (displayItem(order); as item) {
+          <article class="order-card card">
+            <img [src]="item.product.image" [alt]="item.product.title" class="order-card__img" />
+            <div class="order-card__info">
+              <h3>{{ item.product.title }}</h3>
+              <p class="order-id">Order #{{ order.id }}</p>
+              <p class="order-date">{{ order.createdAt | date: 'mediumDate' }}</p>
+              <span class="badge badge--{{ statusClass(order.status) }}">{{ statusLabel(order.status) }}</span>
+            </div>
+            <div class="order-card__right">
+              <span class="order-price">{{ order.total | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+              <div class="order-actions">
+                <a [routerLink]="['/orders/track', order.id]" class="btn btn--primary btn--sm">Track Order</a>
+                @if (!['delivered', 'cancelled'].includes(order.status)) {
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="cancelOrder(order.id)">Cancel</button>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      }
+    </div>
+  }
+</div>
