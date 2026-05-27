@@ -36,6 +36,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/demo-e-commerce/",
               "budgets": [
                 {
                   "type": "initial",
