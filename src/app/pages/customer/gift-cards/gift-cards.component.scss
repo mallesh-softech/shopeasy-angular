@@ -1,0 +1,272 @@
+.gc-page {
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+
+  .gc-balance-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    color: #fff;
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+
+    &__left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    &__icon { font-size: 2rem; }
+
+    &__label {
+      display: block;
+      font-size: 0.8rem;
+      opacity: 0.85;
+      margin-bottom: 0.2rem;
+    }
+
+    &__amount {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    &__right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    &__note {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .btn--ghost {
+      border-color: rgba(255,255,255,0.6);
+      color: #fff;
+      &:hover { background: rgba(255,255,255,0.15); border-color: #fff; }
+    }
+  }
+
+  .gc-layout {
+    display: grid;
+    gap: 1.5rem;
+    @media (min-width: 992px) { grid-template-columns: 240px 1fr; }
+  }
+
+  .gc-sidebar {
+    padding: 1.25rem;
+    height: fit-content;
+    position: sticky;
+    top: calc(var(--nav-height) + 1rem);
+
+    &__banner {
+      text-align: center;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 1rem;
+
+      .gc-icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+      strong { display: block; font-size: 1rem; margin-bottom: 0.25rem; }
+      p { font-size: 0.8rem; color: var(--color-text-muted); }
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        text-align: left;
+        padding: 0.65rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--color-text-muted);
+
+        &.active, &:hover {
+          background: rgba(13, 148, 136, 0.08);
+          color: var(--color-primary);
+        }
+      }
+    }
+  }
+
+  .gc-section {
+    padding: 1.75rem;
+
+    h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .sub { font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  }
+
+  .gc-card-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .gc-card-visual {
+    width: 320px;
+    height: 180px;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #134e4a 100%);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.5rem;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(13,148,136,0.3);
+
+    .gc-card-logo { font-size: 1rem; font-weight: 700; opacity: 0.9; }
+    .gc-card-amount { font-size: 2rem; font-weight: 800; }
+    .gc-card-label { font-size: 0.75rem; letter-spacing: 2px; opacity: 0.7; }
+  }
+
+  .field-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--color-text);
+  }
+
+  .amount-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .amount-btn {
+    padding: 0.5rem 1.25rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: all var(--transition);
+    cursor: pointer;
+
+    &.active {
+      border-color: var(--color-primary);
+      background: rgba(13,148,136,0.08);
+      color: var(--color-primary);
+    }
+    &:hover:not(.active) { border-color: var(--color-primary); }
+  }
+
+  .mt-1 { margin-top: 0.25rem; }
+
+  .gc-buy-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border);
+
+    .gc-total {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      strong { font-size: 1.25rem; color: var(--color-text); margin-left: 0.25rem; }
+    }
+  }
+
+  .redeem-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 2rem;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+
+    .redeem-icon { font-size: 3rem; }
+    .code-input { text-align: center; letter-spacing: 2px; font-size: 1rem; font-weight: 600; }
+  }
+
+  .pin-boxes {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+
+    .pin-box {
+      width: 52px;
+      height: 56px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      color: var(--color-text);
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+
+      &:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
+      }
+    }
+  }
+
+  .redeem-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+  }
+
+  .redeem-success {
+    text-align: center;
+    padding: 2.5rem 1rem;
+
+    .success-icon { font-size: 4rem; margin-bottom: 1rem; }
+    h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+    p { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+  }
+
+  .balance-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: rgba(13,148,136,0.06);
+    border: 2px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    margin-top: 1rem;
+
+    .balance-label { font-size: 0.875rem; color: var(--color-text-muted); }
+    .balance-amount { font-size: 2rem; font-weight: 800; color: var(--color-primary); }
+  }
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}

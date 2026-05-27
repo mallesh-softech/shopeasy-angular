@@ -1,0 +1,169 @@
+<div class="page container gc-page fade-in">
+  <h1 class="page-title">Gift Cards</h1>
+
+  <!-- ACCOUNT BALANCE BANNER -->
+  <div class="gc-balance-banner">
+    <div class="gc-balance-banner__left">
+      <span class="gc-balance-banner__icon">💳</span>
+      <div>
+        <span class="gc-balance-banner__label">Your Gift Card Balance</span>
+        <span class="gc-balance-banner__amount">₹{{ accountBalance() | number }}</span>
+      </div>
+    </div>
+    <div class="gc-balance-banner__right">
+      <span class="gc-balance-banner__note">Valid on all ShopEasy orders</span>
+      <button class="btn btn--ghost btn--sm" (click)="activeTab.set('redeem')">+ Add Balance</button>
+    </div>
+  </div>
+
+  <div class="gc-layout">
+    <!-- SIDEBAR -->
+    <aside class="gc-sidebar card">
+      <div class="gc-sidebar__banner">
+        <span class="gc-icon">🎁</span>
+        <strong>ShopEasy Gift Cards</strong>
+        <p>The perfect gift for everyone</p>
+      </div>
+      <nav>
+        <button type="button" [class.active]="activeTab() === 'buy'" (click)="activeTab.set('buy')">
+          <span>🛒</span> Buy Gift Card
+        </button>
+        <button type="button" [class.active]="activeTab() === 'redeem'" (click)="activeTab.set('redeem')">
+          <span>✅</span> Redeem Gift Card
+        </button>
+        <button type="button" [class.active]="activeTab() === 'balance'" (click)="activeTab.set('balance')">
+          <span>💳</span> Check Balance
+        </button>
+      </nav>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="gc-content">
+
+      <!-- BUY -->
+      @if (activeTab() === 'buy') {
+        <div class="card gc-section">
+          <h2>Buy a Gift Card</h2>
+          <p class="sub">Choose an amount and send it to someone special</p>
+
+          <div class="gc-card-preview">
+            <div class="gc-card-visual">
+              <span class="gc-card-logo">🛍️ ShopEasy</span>
+              <span class="gc-card-amount">₹{{ customAmount || selectedAmount() }}</span>
+              <span class="gc-card-label">GIFT CARD</span>
+            </div>
+          </div>
+
+          <label class="field-label">Select Amount</label>
+          <div class="amount-grid">
+            @for (a of amounts; track a) {
+              <button type="button" class="amount-btn" [class.active]="selectedAmount() === a && !customAmount" (click)="selectAmount(a)">
+                ₹{{ a | number }}
+              </button>
+            }
+          </div>
+
+          <div class="form-group mt-1">
+            <label>Or enter custom amount (₹100 – ₹50,000)</label>
+            <input class="form-input" type="number" placeholder="Enter amount" [(ngModel)]="customAmount" min="100" max="50000" />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Recipient Name *</label>
+              <input class="form-input" placeholder="Enter name" [(ngModel)]="recipientName" />
+            </div>
+            <div class="form-group">
+              <label>Recipient Email *</label>
+              <input class="form-input" type="email" placeholder="Enter email" [(ngModel)]="recipientEmail" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Personal Message (optional)</label>
+            <textarea class="form-input" rows="3" placeholder="Write a message..." [(ngModel)]="message"></textarea>
+          </div>
+
+          <div class="gc-buy-footer">
+            <div class="gc-total">
+              Total: <strong>₹{{ customAmount || selectedAmount() | number }}</strong>
+            </div>
+            <button class="btn btn--primary btn--lg">Proceed to Pay</button>
+          </div>
+        </div>
+      }
+
+      <!-- REDEEM -->
+      @if (activeTab() === 'redeem') {
+        <div class="card gc-section">
+          <h2>Redeem Gift Card</h2>
+          <p class="sub">Enter your 16-digit gift card code to add balance to your account</p>
+
+          @if (!redeemSuccess()) {
+            <div class="redeem-box">
+              <div class="redeem-icon">🎁</div>
+              <div class="form-group" style="width:100%;max-width:360px">
+                <label>Gift Card Code</label>
+                <input class="form-input code-input" placeholder="XXXX-XXXX-XXXX-XXXX" [(ngModel)]="redeemCode" maxlength="19" />
+              </div>
+              <div class="form-group" style="width:100%;max-width:360px">
+                <label>4-Digit PIN</label>
+                <div class="pin-boxes">
+                  @for (p of redeemPin; track $index) {
+                    <input
+                      class="pin-box"
+                      type="password"
+                      inputmode="numeric"
+                      maxlength="1"
+                      [value]="redeemPin[$index]"
+                      (input)="onPinInput($event, $index)"
+                      (keydown)="onPinKeydown($event, $index)"
+                    />
+                  }
+                </div>
+              </div>
+              <button class="btn btn--primary" (click)="redeem()">Redeem Now</button>
+            </div>
+            <div class="redeem-info">
+              <div class="info-item"><span>✅</span> Balance added instantly to your account</div>
+              <div class="info-item"><span>📅</span> Valid for 1 year from date of issue</div>
+              <div class="info-item"><span>🔒</span> Non-transferable & non-refundable</div>
+            </div>
+          } @else {
+            <div class="redeem-success">
+              <div class="success-icon">🎉</div>
+              <h3>Gift Card Redeemed!</h3>
+              <p>Your balance has been added. New account balance: <strong>₹{{ accountBalance() | number }}</strong></p>
+              <button class="btn btn--primary" (click)="redeemSuccess.set(false); redeemCode=''; redeemPin=['','','','']">Redeem Another</button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- BALANCE -->
+      @if (activeTab() === 'balance') {
+        <div class="card gc-section">
+          <h2>Check Gift Card Balance</h2>
+          <p class="sub">Enter your gift card code to check the remaining balance</p>
+
+          <div class="redeem-box">
+            <div class="redeem-icon">💳</div>
+            <div class="form-group" style="width:100%;max-width:360px">
+              <label>Gift Card Code</label>
+              <input class="form-input code-input" placeholder="XXXX-XXXX-XXXX-XXXX" [(ngModel)]="balanceCode" maxlength="19" />
+            </div>
+            <button class="btn btn--primary" (click)="checkBalance()">Check Balance</button>
+          </div>
+
+          @if (cardBalance() !== null) {
+            <div class="balance-result">
+              <span class="balance-label">Available Balance</span>
+              <span class="balance-amount">₹{{ cardBalance() | number }}</span>
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

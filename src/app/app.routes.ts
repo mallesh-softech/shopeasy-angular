@@ -133,6 +133,30 @@ export const routes: Routes = [
             (m) => m.ProfileComponent
           ),
       },
+
+      {
+        path: 'gift-cards',
+        loadComponent: () =>
+          import('./pages/customer/gift-cards/gift-cards.component').then(
+            (m) => m.GiftCardsComponent
+          ),
+      },
+
+      {
+        path: 'coupons',
+        loadComponent: () =>
+          import('./pages/customer/coupons/coupons.component').then(
+            (m) => m.CouponsComponent
+          ),
+      },
+
+      {
+        path: 'contact',
+        loadComponent: () =>
+          import('./pages/customer/contact/contact.component').then(
+            (m) => m.ContactComponent
+          ),
+      },
     ],
   },
 

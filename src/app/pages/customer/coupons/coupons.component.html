@@ -1,0 +1,99 @@
+<div class="page container coupons-page fade-in">
+  <h1 class="page-title">Coupons & Offers</h1>
+
+  <div class="coupons-layout">
+    <!-- SIDEBAR -->
+    <aside class="coupons-sidebar card">
+      <div class="sidebar-banner">
+        <span class="sidebar-icon">🏷️</span>
+        <strong>My Coupons</strong>
+        <p>{{ available.length }} coupons available</p>
+      </div>
+      <nav>
+        <button type="button" [class.active]="activeTab() === 'available'" (click)="activeTab.set('available')">
+          <span>🎟️</span> Available Coupons
+          <span class="count-badge">{{ available.length }}</span>
+        </button>
+        <button type="button" [class.active]="activeTab() === 'used'" (click)="activeTab.set('used')">
+          <span>✅</span> Used Coupons
+          <span class="count-badge">{{ used.length }}</span>
+        </button>
+
+      </nav>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="coupons-content">
+
+      <!-- AVAILABLE -->
+      @if (activeTab() === 'available') {
+        <div class="card coupons-section">
+          <h2>Available Coupons</h2>
+          <p class="sub">Apply these coupons at checkout to save more</p>
+          <div class="coupons-list">
+            @for (c of available; track c.code) {
+              <div class="coupon-card">
+                <div class="coupon-left">
+                  <div class="coupon-discount">{{ c.discount }}</div>
+                  <div class="coupon-category">{{ c.category }}</div>
+                </div>
+                <div class="coupon-divider">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="coupon-right">
+                  <div class="coupon-title">{{ c.title }}</div>
+                  <div class="coupon-desc">{{ c.desc }}</div>
+                  @if (c.minOrder > 0) {
+                    <div class="coupon-min">Min. order: ₹{{ c.minOrder }}</div>
+                  }
+                  <div class="coupon-footer">
+                    <span class="coupon-expiry">Expires: {{ c.expiry }}</span>
+                    <button class="copy-btn" [class.copied]="copiedCode() === c.code" (click)="copy(c.code)">
+                      {{ copiedCode() === c.code ? '✅ Copied!' : c.code }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- USED -->
+      @if (activeTab() === 'used') {
+        <div class="card coupons-section">
+          <h2>Used Coupons</h2>
+          <p class="sub">Coupons you've already redeemed</p>
+          @if (used.length === 0) {
+            <div class="empty-coupons">
+              <span>🎟️</span>
+              <p>No used coupons yet</p>
+            </div>
+          } @else {
+            <div class="coupons-list">
+              @for (c of used; track c.code) {
+                <div class="coupon-card used">
+                  <div class="coupon-left">
+                    <div class="coupon-discount">{{ c.discount }}</div>
+                    <div class="coupon-category">{{ c.category }}</div>
+                  </div>
+                  <div class="coupon-divider"><span></span><span></span><span></span></div>
+                  <div class="coupon-right">
+                    <div class="coupon-title">{{ c.title }}</div>
+                    <div class="coupon-desc">{{ c.desc }}</div>
+                    <div class="coupon-footer">
+                      <span class="coupon-expiry">Expired: {{ c.expiry }}</span>
+                      <span class="used-tag">Used</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+
+    </div>
+  </div>
+</div>
