@@ -20,7 +20,7 @@ export class ProductService {
     if (this.catalog()) {
       return of(this.catalog()!);
     }
-    return this.http.get<ProductCatalog>('/assets/data/products.json').pipe(
+    return this.http.get<ProductCatalog>('assets/data/products.json').pipe(
       tap((data) => this.catalog.set(data)),
     );
   }
