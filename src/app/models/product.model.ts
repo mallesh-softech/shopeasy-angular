@@ -42,6 +42,20 @@ export interface ProductCatalog {
   products: Product[];
 }
 
+export interface CustomerReview {
+  id: string;
+  productId: string;
+  customerName: string;
+  avatar: string;
+  rating: number;
+  title: string;
+  comment: string;
+  date: string;
+  verified: boolean;
+  helpful: number;
+  images?: string[];
+}
+
 export interface ProductFilters {
   category?: string;
   brand?: string;
