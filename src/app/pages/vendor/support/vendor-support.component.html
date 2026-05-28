@@ -1,0 +1,213 @@
+<div class="support-page fade-in">
+  <div class="page-header">
+    <div>
+      <h1>Support & Help Center</h1>
+      <p>Get help, raise tickets and find answers</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card red"><div class="stat-icon">🔴</div><div class="stat-info"><span class="stat-val">{{ openCount }}</span><span class="stat-lbl">Open Tickets</span></div></div>
+    <div class="stat-card blue"><div class="stat-icon">🔵</div><div class="stat-info"><span class="stat-val">{{ inProgressCount }}</span><span class="stat-lbl">In Progress</span></div></div>
+    <div class="stat-card green"><div class="stat-icon">🟢</div><div class="stat-info"><span class="stat-val">{{ resolvedCount }}</span><span class="stat-lbl">Resolved</span></div></div>
+    <div class="stat-card purple">
+      <div class="stat-icon">💬</div>
+      <div class="stat-info"><span class="stat-val">24/7</span><span class="stat-lbl">Support Available</span></div>
+    </div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn" [class.active]="activeTab() === 'tickets'" (click)="activeTab.set('tickets')">My Tickets</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'new'" (click)="activeTab.set('new')">Raise Ticket</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'faq'" (click)="activeTab.set('faq')">FAQ</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'chat'" (click)="activeTab.set('chat')">Live Chat</button>
+  </div>
+
+  @if (activeTab() === 'tickets') {
+    <div class="content-card">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Ticket ID</th><th>Subject</th><th>Category</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            @if (loading()) {
+              @for (i of [1,2,3]; track i) { <tr><td colspan="7"><div class="skeleton-row"></div></td></tr> }
+            } @else if (tickets().length === 0) {
+              <tr><td colspan="7" class="empty-cell">No tickets raised yet</td></tr>
+            } @else {
+              @for (t of tickets(); track t.id) {
+                <tr>
+                  <td><code>{{ t.id }}</code></td>
+                  <td class="subject-cell">{{ t.subject }}</td>
+                  <td><span class="cat-badge">{{ t.category }}</span></td>
+                  <td><span class="priority-badge" [class]="'p-' + t.priority">{{ t.priority }}</span></td>
+                  <td><span class="tstatus" [class]="'ts-' + t.status">{{ t.status }}</span></td>
+                  <td>{{ t.createdDate }}</td>
+                  <td>
+                    <div class="action-group">
+                      <button class="act-view" (click)="selectedTicket.set(t)">View</button>
+                      @if (t.status !== 'closed' && t.status !== 'resolved') {
+                        <button class="act-close" (click)="closeTicket(t.id)">Close</button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'new') {
+    <div class="content-card form-card">
+      <h3>Raise a Support Ticket</h3>
+      <form [formGroup]="ticketForm" (ngSubmit)="submitTicket()" class="ticket-form">
+        <div class="form-group full">
+          <label>Subject *</label>
+          <input formControlName="subject" placeholder="Brief description of your issue" />
+          @if (ticketForm.get('subject')?.invalid && ticketForm.get('subject')?.touched) {
+            <span class="err">Required, min 5 characters</span>
+          }
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select formControlName="category">
+              <option value="">Select category</option>
+              @for (cat of categories; track cat) { <option [value]="cat">{{ cat }}</option> }
+            </select>
+            @if (ticketForm.get('category')?.invalid && ticketForm.get('category')?.touched) {
+              <span class="err">Please select a category</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Priority *</label>
+            <select formControlName="priority">
+              @for (p of priorities; track p) { <option [value]="p">{{ p | titlecase }}</option> }
+            </select>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Description *</label>
+          <textarea formControlName="description" rows="5" placeholder="Describe your issue in detail..."></textarea>
+          @if (ticketForm.get('description')?.invalid && ticketForm.get('description')?.touched) {
+            <span class="err">Required, min 20 characters</span>
+          }
+        </div>
+        <div class="form-group full">
+          <label>Attachment (optional)</label>
+          <div class="upload-area">
+            <span>📎 Click to upload or drag & drop</span>
+            <small>PNG, JPG, PDF up to 5MB</small>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="activeTab.set('tickets')">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="submitting()">
+            {{ submitting() ? 'Submitting...' : 'Submit Ticket' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (activeTab() === 'faq') {
+    <div class="content-card">
+      <h3>Frequently Asked Questions</h3>
+      <div class="faq-list">
+        @for (faq of faqs(); track $index) {
+          <div class="faq-item" [class.open]="faq.open" (click)="toggleFaq($index)">
+            <div class="faq-q">
+              <span>{{ faq.question }}</span>
+              <svg class="faq-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            @if (faq.open) {
+              <div class="faq-a">{{ faq.answer }}</div>
+            }
+          </div>
+        }
+      </div>
+      <div class="contact-cards">
+        <div class="contact-card">
+          <div class="contact-icon">📧</div>
+          <div><div class="contact-title">Email Support</div><div class="contact-val">support&#64;sellerhub.com</div></div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">📞</div>
+          <div><div class="contact-title">Phone Support</div><div class="contact-val">1800-XXX-XXXX</div></div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">💬</div>
+          <div><div class="contact-title">Live Chat</div><div class="contact-val">Available 9AM–9PM</div></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'chat') {
+    <div class="content-card chat-card">
+      <div class="chat-header">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-name">SellerHub Support</div>
+          <div class="chat-status">🟢 Online</div>
+        </div>
+      </div>
+      <div class="chat-messages">
+        @for (msg of chatMessages(); track $index) {
+          <div class="chat-bubble" [class.vendor]="msg.sender === 'vendor'" [class.admin]="msg.sender === 'admin'">
+            <div class="bubble-text">{{ msg.message }}</div>
+            <div class="bubble-time">{{ msg.time }}</div>
+          </div>
+        }
+      </div>
+      <div class="chat-input-area">
+        <input
+          type="text"
+          placeholder="Type your message..."
+          [value]="chatMessage()"
+          (input)="chatMessage.set($any($event.target).value)"
+          (keydown.enter)="sendChat()"
+        />
+        <button class="send-btn" (click)="sendChat()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (selectedTicket()) {
+    <div class="modal-overlay" (click)="selectedTicket.set(null)">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ selectedTicket()!.id }} — {{ selectedTicket()!.subject }}</h3>
+          <button class="close-btn" (click)="selectedTicket.set(null)">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-grid">
+            <div class="detail-item"><span>Category</span><strong>{{ selectedTicket()!.category }}</strong></div>
+            <div class="detail-item"><span>Priority</span><strong><span class="priority-badge" [class]="'p-' + selectedTicket()!.priority">{{ selectedTicket()!.priority }}</span></strong></div>
+            <div class="detail-item"><span>Status</span><strong><span class="tstatus" [class]="'ts-' + selectedTicket()!.status">{{ selectedTicket()!.status }}</span></strong></div>
+            <div class="detail-item"><span>Created</span><strong>{{ selectedTicket()!.createdDate }}</strong></div>
+            <div class="detail-item full"><span>Description</span><strong>{{ selectedTicket()!.description }}</strong></div>
+          </div>
+          @if (selectedTicket()!.messages?.length) {
+            <div class="ticket-messages">
+              <h4>Replies</h4>
+              @for (msg of selectedTicket()!.messages; track $index) {
+                <div class="ticket-msg" [class.admin-msg]="msg.sender === 'admin'">
+                  <span class="msg-sender">{{ msg.sender === 'admin' ? '🛡️ Support' : '👤 You' }}</span>
+                  <p>{{ msg.message }}</p>
+                  <span class="msg-time">{{ msg.time }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

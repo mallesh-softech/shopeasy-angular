@@ -6,11 +6,12 @@ import { Order, OrderItem, OrderStatus } from '../../../../models/order.model';
 import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../models/product.model';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { CustomerInvoiceComponent } from './customer-invoice/customer-invoice.component';
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, DatePipe, EmptyStateComponent],
+  imports: [RouterLink, CurrencyPipe, DatePipe, EmptyStateComponent, CustomerInvoiceComponent],
   templateUrl: './order-list.component.html',
   styleUrl: './order-list.component.scss',
 })
@@ -29,6 +30,8 @@ export class OrderListComponent implements OnInit {
     { id: 'delivered' as const, label: 'Delivered' },
     { id: 'cancelled' as const, label: 'Cancelled' },
   ];
+
+  invoiceOrder = signal<Order | null>(null);
 
   ngOnInit(): void {
     this.products.getProductById('p1').subscribe((p) => {

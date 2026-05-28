@@ -1,0 +1,187 @@
+<div class="products-page fade-in">
+  <div class="page-header">
+    <div>
+      <h1>My Products</h1>
+      <p>Manage your product catalog</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search products..." (input)="onSearch($event)" />
+    </div>
+    <select class="filter-select" (change)="onFilter($event)">
+      <option value="">All Categories</option>
+      <option>Electronics</option><option>Fashion</option><option>Sports</option>
+    </select>
+    <select class="filter-select" (change)="onStatusFilter($event)">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="draft">Draft</option>
+    </select>
+    <div class="view-toggle">
+      <button [class.active]="viewMode() === 'grid'" (click)="viewMode.set('grid')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </button>
+      <button [class.active]="viewMode() === 'table'" (click)="viewMode.set('table')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="grid-view">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="skeleton-card"></div>
+      }
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h3>No products found</h3>
+      <p>Try adjusting your search or filters</p>
+      <a routerLink="/vendor/products/add" class="btn-primary">Add your first product</a>
+    </div>
+  } @else if (viewMode() === 'grid') {
+    <div class="grid-view">
+      @for (p of filtered(); track p.id) {
+        <div class="product-card">
+          <div class="product-img-wrap">
+            <img [src]="p.image" [alt]="p.name" />
+            <span class="status-pill" [class]="'status-' + p.status">{{ p.status }}</span>
+          </div>
+          <div class="product-body">
+            <span class="product-cat">{{ p.category }}</span>
+            <h4 class="product-name">{{ p.name }}</h4>
+            <div class="product-meta">
+              <span class="price">₹{{ p.price.toLocaleString() }}</span>
+              @if (p.discount > 0) { <span class="discount">-{{ p.discount }}%</span> }
+            </div>
+            <div class="product-stats">
+              <span>Stock: <strong [class.low]="p.stock <= 10" [class.out]="p.stock === 0">{{ p.stock }}</strong></span>
+              <span>Sold: <strong>{{ p.salesCount }}</strong></span>
+              <span>⭐ {{ p.rating }}</span>
+            </div>
+          </div>
+          <div class="product-actions">
+            <button class="action-btn edit" title="Edit product" (click)="editProduct(p.id)">✏️</button>
+            <button class="action-btn reviews" title="View reviews" (click)="openReviews(p)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </button>
+            <button class="action-btn toggle" title="Toggle status" (click)="toggleStatus(p)">{{ p.status === 'active' ? '🔴' : '🟢' }}</button>
+            <button class="action-btn delete" title="Delete" (click)="deleteProduct(p.id)">🗑️</button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Sales</th><th>Rating</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of filtered(); track p.id) {
+            <tr>
+              <td>
+                <div class="table-product">
+                  <img [src]="p.image" [alt]="p.name" />
+                  <div>
+                    <span class="product-name-sm">{{ p.name }}</span>
+                    <span class="sku">{{ p.sku }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ p.category }}</td>
+              <td><strong>₹{{ p.price.toLocaleString() }}</strong></td>
+              <td><span [class.text-danger]="p.stock === 0" [class.text-warning]="p.stock > 0 && p.stock <= 10">{{ p.stock }}</span></td>
+              <td><span class="status-pill" [class]="'status-' + p.status">{{ p.status }}</span></td>
+              <td>{{ p.salesCount }}</td>
+              <td>⭐ {{ p.rating }}</td>
+              <td>
+                <div class="table-actions">
+                  <button class="action-btn edit" title="Edit" (click)="editProduct(p.id)">✏️</button>
+                  <button class="action-btn reviews" title="View reviews" (click)="openReviews(p)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </button>
+                  <button class="action-btn delete" title="Delete" (click)="deleteProduct(p.id)">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (reviewProduct()) {
+  <div class="modal-overlay" (click)="closeReviews()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title">
+          <img [src]="reviewProduct()!.image" [alt]="reviewProduct()!.name" class="modal-product-img" />
+          <div>
+            <h3>Customer Reviews</h3>
+            <p>{{ reviewProduct()!.name }}</p>
+          </div>
+        </div>
+        <button class="close-btn" (click)="closeReviews()">✕</button>
+      </div>
+      <div class="rating-summary">
+        <div class="rating-big">
+          <span class="rating-num">{{ reviewProduct()!.rating }}</span>
+          <div class="stars-row">{{ getStars(reviewProduct()!.rating) }}</div>
+          <span class="rating-count">{{ reviews().length }} reviews</span>
+        </div>
+        <div class="rating-bars">
+          @for (star of [5,4,3,2,1]; track star) {
+            <div class="rating-bar-row">
+              <span class="star-label">{{ star }}★</span>
+              <div class="bar-track">
+                <div class="bar-fill" [style.width.%]="getRatingPct(star)"></div>
+              </div>
+              <span class="bar-count">{{ getRatingCount(star) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="modal-body">
+        @if (reviewsLoading()) {
+          @for (i of [1,2,3]; track i) {
+            <div class="review-skeleton"></div>
+          }
+        } @else if (reviews().length === 0) {
+          <div class="no-reviews">
+            <span>⭐</span>
+            <p>No reviews yet for this product</p>
+          </div>
+        } @else {
+          @for (r of reviews(); track r.id) {
+            <div class="review-card">
+              <div class="review-top">
+                <img [src]="r.avatar" [alt]="r.customerName" class="reviewer-avatar" />
+                <div class="reviewer-info">
+                  <div class="reviewer-name-row">
+                    <strong>{{ r.customerName }}</strong>
+                    @if (r.verified) {
+                      <span class="verified-badge">✓ Verified Purchase</span>
+                    }
+                  </div>
+                  <div class="review-stars">{{ getStars(r.rating) }}</div>
+                </div>
+                <span class="review-date">{{ r.date }}</span>
+              </div>
+              <h4 class="review-title">{{ r.title }}</h4>
+              <p class="review-comment">{{ r.comment }}</p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

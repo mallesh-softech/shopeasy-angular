@@ -1,0 +1,163 @@
+<div class="promo-page fade-in">
+  <div class="page-header">
+    <div>
+      <h1>Promotions & Coupons</h1>
+      <p>Create and manage discount campaigns</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create Coupon
+    </button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-info">
+        <span class="stat-value">{{ active }}</span>
+        <span class="stat-label">Active Promotions</span>
+      </div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-info">
+        <span class="stat-value">{{ expired }}</span>
+        <span class="stat-label">Expired Promotions</span>
+      </div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-icon">🎟️</div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalUsage }}</span>
+        <span class="stat-label">Total Coupon Usage</span>
+      </div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <span class="stat-value">₹12,450</span>
+        <span class="stat-label">Revenue from Promos</span>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton-wrap">
+      @for (i of [1,2,3]; track i) { <div class="skeleton-card"></div> }
+    </div>
+  } @else if (coupons().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🎁</div>
+      <h3>No promotions yet</h3>
+      <p>Create your first coupon to boost sales</p>
+      <button class="btn-primary" (click)="openCreate()">Create Coupon</button>
+    </div>
+  } @else {
+    <div class="coupon-grid">
+      @for (c of coupons(); track c.id) {
+        <div class="coupon-card" [class]="'coupon-' + c.status">
+          <div class="coupon-header">
+            <div class="coupon-badge" [class]="'badge-' + c.discountType">
+              {{ c.discountType === 'percentage' ? c.discountValue + '% OFF' : '₹' + c.discountValue + ' OFF' }}
+            </div>
+            <span class="status-chip" [class]="'chip-' + c.status">{{ c.status }}</span>
+          </div>
+          <div class="coupon-code">{{ c.code }}</div>
+          <div class="coupon-meta">
+            <span>Min order: ₹{{ c.minOrderValue }}</span>
+            <span>Used: {{ c.usageCount }}/{{ c.usageLimit }}</span>
+          </div>
+          <div class="coupon-dates">
+            <span>📅 {{ c.startDate }} → {{ c.expiryDate }}</span>
+          </div>
+          @if (c.applicableCategories.length) {
+            <div class="coupon-cats">
+              @for (cat of c.applicableCategories; track cat) {
+                <span class="cat-tag">{{ cat }}</span>
+              }
+            </div>
+          }
+          <div class="usage-bar">
+            <div class="usage-fill" [style.width.%]="(c.usageCount / c.usageLimit) * 100"></div>
+          </div>
+          <div class="coupon-actions">
+            <button class="act-btn edit" (click)="editCoupon(c)" title="Edit">✏️</button>
+            <button class="act-btn dup" (click)="duplicate(c)" title="Duplicate">📋</button>
+            <button class="act-btn toggle" (click)="toggle(c)" [disabled]="c.status === 'expired'" title="Toggle">
+              {{ c.status === 'active' ? '⏸️' : '▶️' }}
+            </button>
+            <button class="act-btn del" (click)="delete(c.id)" title="Delete">🗑️</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (showForm()) {
+    <div class="modal-overlay" (click)="showForm.set(false)">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ editingCoupon() ? 'Edit Coupon' : 'Create Coupon' }}</h3>
+          <button class="close-btn" (click)="showForm.set(false)">✕</button>
+        </div>
+        <form [formGroup]="form" (ngSubmit)="save()" class="coupon-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Coupon Code *</label>
+              <input formControlName="code" placeholder="e.g. SAVE20" class="text-upper" />
+              @if (form.get('code')?.invalid && form.get('code')?.touched) {
+                <span class="err">Required, min 3 chars</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>Discount Type *</label>
+              <select formControlName="discountType">
+                <option value="percentage">Percentage (%)</option>
+                <option value="flat">Flat Amount (₹)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Discount Value *</label>
+              <input type="number" formControlName="discountValue" placeholder="e.g. 20" />
+              @if (form.get('discountValue')?.invalid && form.get('discountValue')?.touched) {
+                <span class="err">Required, min 1</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>Min Order Value (₹) *</label>
+              <input type="number" formControlName="minOrderValue" placeholder="e.g. 500" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Usage Limit *</label>
+              <input type="number" formControlName="usageLimit" placeholder="e.g. 100" />
+            </div>
+            <div class="form-group">
+              <label>Applicable Categories</label>
+              <input formControlName="applicableCategories" placeholder="Electronics, Fashion" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Start Date *</label>
+              <input type="date" formControlName="startDate" />
+            </div>
+            <div class="form-group">
+              <label>Expiry Date *</label>
+              <input type="date" formControlName="expiryDate" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="showForm.set(false)">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="saving()">
+              {{ saving() ? 'Saving...' : (editingCoupon() ? 'Update Coupon' : 'Create Coupon') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,105 @@
+<div class="dashboard fade-in">
+  <div class="page-header">
+    <div>
+      <h1>Good morning, {{ getFirstName() }}! 👋</h1>
+      <p>Here's what's happening with your store today.</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    @for (stat of stats(); track stat.label) {
+      <div class="stat-card" [style.--accent]="stat.color">
+        <div class="stat-icon" [innerHTML]="stat.icon"></div>
+        <div class="stat-info">
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-value">{{ stat.value }}</span>
+          <span class="stat-change" [class.positive]="stat.change > 0" [class.negative]="stat.change < 0">
+            {{ stat.change > 0 ? '↑' : '↓' }} {{ Math.abs(stat.change) }}% vs last month
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Monthly Revenue</h3>
+        <span class="badge-success">+18.5% this year</span>
+      </div>
+      <div class="chart-area">
+        <div class="bar-chart">
+          @for (val of monthlyRevenue(); track $index; let i = $index) {
+            <div class="bar-wrap">
+              <div class="bar" [style.height.%]="(val / maxRevenue()) * 100" [class.current]="i === 11" [title]="'₹' + (val/1000).toFixed(0) + 'K'"></div>
+              <span class="bar-label">{{ months[i] }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="orders-card">
+      <div class="card-header">
+        <h3>Recent Orders</h3>
+        <a routerLink="/vendor/orders" class="view-all">View all →</a>
+      </div>
+      @if (loading()) {
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton-row"></div>
+        }
+      } @else {
+        @for (order of recentOrders(); track order.id) {
+          <div class="order-row">
+            <img [src]="order.productImage" [alt]="order.product" />
+            <div class="order-info">
+              <span class="order-id">{{ order.id }}</span>
+              <span class="order-customer">{{ order.customerName }}</span>
+            </div>
+            <span class="order-amount">₹{{ order.amount.toLocaleString() }}</span>
+            <span class="status-badge" [class]="'status-' + order.deliveryStatus">{{ order.deliveryStatus }}</span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="top-products-card">
+      <div class="card-header">
+        <h3>Top Selling Products</h3>
+        <a routerLink="/vendor/products" class="view-all">View all →</a>
+      </div>
+      @for (p of topProducts(); track p.id) {
+        <div class="product-row">
+          <img [src]="p.image" [alt]="p.name" />
+          <div class="product-info">
+            <span class="product-name">{{ p.name }}</span>
+            <span class="product-cat">{{ p.category }}</span>
+          </div>
+          <div class="product-stats">
+            <span class="product-sales">{{ p.salesCount }} sold</span>
+            <span class="product-price">₹{{ p.price.toLocaleString() }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="alerts-card">
+      <div class="card-header">
+        <h3>Inventory Alerts</h3>
+        <a routerLink="/vendor/inventory" class="view-all">Manage →</a>
+      </div>
+      @for (alert of inventoryAlerts(); track alert.id) {
+        <div class="alert-row" [class.critical]="alert.currentStock === 0">
+          <div class="alert-dot" [class.out]="alert.currentStock === 0" [class.low]="alert.currentStock > 0 && alert.currentStock <= 10"></div>
+          <div class="alert-info">
+            <span>{{ alert.productName }}</span>
+            <small>{{ alert.currentStock === 0 ? 'Out of stock' : alert.currentStock + ' units left' }}</small>
+          </div>
+          <span class="alert-sku">{{ alert.sku }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

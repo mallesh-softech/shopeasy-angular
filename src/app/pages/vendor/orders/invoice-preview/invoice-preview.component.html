@@ -1,0 +1,115 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="invoice-modal" (click)="$event.stopPropagation()">
+
+    <!-- Toolbar -->
+    <div class="invoice-actions no-print">
+      <span class="inv-toolbar-title">🧾 Invoice Preview</span>
+      <div class="inv-toolbar-btns">
+        <button class="act-print" (click)="printInvoice()">🖨️ Print</button>
+        <button class="act-download" (click)="printInvoice()">⬇️ Download PDF</button>
+        <button class="act-close" (click)="close.emit()">✕ Close</button>
+      </div>
+    </div>
+
+    <!-- Invoice Paper -->
+    <div class="invoice-paper">
+
+      <!-- Header -->
+      <div class="inv-header">
+        <div class="inv-brand">
+          <div class="brand-logo">SH</div>
+          <div class="brand-details">
+            <div class="brand-name">SellerHub Pvt. Ltd.</div>
+            <div class="brand-addr">42 Commerce Street, Bengaluru - 560001</div>
+            <div class="brand-gst">GSTIN: 29ABCDE1234F1Z5 &nbsp;|&nbsp; CIN: U74999KA2020PTC123456</div>
+          </div>
+        </div>
+        <div class="inv-meta">
+          <div class="inv-title">TAX INVOICE</div>
+          <div class="inv-num">Invoice #: INV-{{ order.id }}</div>
+          <div class="inv-date">Date: {{ order.orderDate }}</div>
+          <div class="inv-order">Order: {{ order.id }}</div>
+        </div>
+      </div>
+
+      <div class="inv-divider"></div>
+
+      <!-- Parties -->
+      <div class="inv-parties">
+        <div class="party-box">
+          <div class="party-label">BILL FROM (Seller)</div>
+          <div class="party-name">SellerHub Vendor</div>
+          <div class="party-addr">42 Commerce Street, Bengaluru - 560001</div>
+          <div class="party-gst">GSTIN: 29ABCDE1234F1Z5</div>
+          <div class="party-phone">Phone: +91-98765-43210</div>
+        </div>
+        <div class="party-box">
+          <div class="party-label">BILL TO (Customer)</div>
+          <div class="party-name">{{ order.customerName }}</div>
+          <div class="party-addr">{{ order.shippingAddress }}</div>
+          <div class="party-email">{{ order.customerEmail }}</div>
+        </div>
+      </div>
+
+      <!-- Product Table -->
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product Description</th>
+            <th>HSN</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Taxable Amt</th>
+            <th>CGST (9%)</th>
+            <th>SGST (9%)</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>{{ order.product }}</td>
+            <td>8518</td>
+            <td>1</td>
+            <td>₹{{ baseAmount.toLocaleString() }}</td>
+            <td>₹{{ baseAmount.toLocaleString() }}</td>
+            <td>₹{{ cgst.toLocaleString() }}</td>
+            <td>₹{{ sgst.toLocaleString() }}</td>
+            <td>₹{{ order.amount.toLocaleString() }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Summary -->
+      <div class="inv-summary">
+        <div class="inv-notes">
+          <div class="note-title">Terms & Conditions</div>
+          <ul>
+            <li>Goods once sold will not be taken back.</li>
+            <li>All disputes subject to Bengaluru jurisdiction.</li>
+            <li>Payment due within 30 days of invoice.</li>
+          </ul>
+        </div>
+        <div class="inv-totals">
+          <div class="total-row"><span>Subtotal</span><span>₹{{ baseAmount.toLocaleString() }}</span></div>
+          <div class="total-row"><span>CGST (9%)</span><span>₹{{ cgst.toLocaleString() }}</span></div>
+          <div class="total-row"><span>SGST (9%)</span><span>₹{{ sgst.toLocaleString() }}</span></div>
+          <div class="total-row grand"><span>Grand Total</span><span>₹{{ order.amount.toLocaleString() }}</span></div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="inv-footer">
+        <div class="payment-status" [class]="'ps-' + order.paymentStatus">
+          Payment Status: {{ order.paymentStatus | uppercase }}
+        </div>
+        <div class="inv-sign">
+          <div class="sign-line"></div>
+          <div class="sign-label">Authorized Signatory</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

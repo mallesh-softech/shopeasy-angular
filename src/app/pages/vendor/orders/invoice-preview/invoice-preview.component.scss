@@ -1,0 +1,281 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+}
+
+.invoice-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Toolbar ── */
+.invoice-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+  border-radius: 16px 16px 0 0;
+}
+
+.inv-toolbar-title {
+  font-weight: 700;
+  color: #1e1b4b;
+  font-size: 0.95rem;
+}
+
+.inv-toolbar-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.act-print,
+.act-download,
+.act-close {
+  padding: 0.45rem 0.875rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.act-print    { background: #dbeafe; color: #1e40af; &:hover { background: #bfdbfe; } }
+.act-download { background: #d1fae5; color: #065f46; &:hover { background: #a7f3d0; } }
+.act-close    { background: #fee2e2; color: #991b1b; &:hover { background: #fecaca; } }
+
+/* ── Paper ── */
+.invoice-paper {
+  padding: 2rem;
+  font-size: 0.875rem;
+  color: #1f2937;
+}
+
+/* ── Header ── */
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.inv-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-logo {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #fff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.brand-name  { font-size: 1rem; font-weight: 700; color: #1e1b4b; }
+.brand-addr,
+.brand-gst   { font-size: 0.75rem; color: #6b7280; margin-top: 0.15rem; }
+
+.inv-meta    { text-align: right; }
+
+.inv-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  letter-spacing: 1px;
+  margin-bottom: 0.4rem;
+}
+
+.inv-num,
+.inv-date,
+.inv-order { font-size: 0.8rem; color: #6b7280; margin-top: 0.2rem; }
+
+/* ── Divider ── */
+.inv-divider {
+  height: 2px;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa, #7c3aed);
+  margin-bottom: 1.25rem;
+  border-radius: 2px;
+}
+
+/* ── Parties ── */
+.inv-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.party-box {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #f0f0f0;
+}
+
+.party-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #7c3aed;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.party-name  { font-weight: 700; color: #1e1b4b; margin-bottom: 0.25rem; }
+.party-addr,
+.party-gst,
+.party-email,
+.party-phone { font-size: 0.78rem; color: #6b7280; line-height: 1.5; }
+
+/* ── Table ── */
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.8rem;
+
+  th {
+    background: #1e1b4b;
+    color: #fff;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &:first-child { border-radius: 6px 0 0 0; }
+    &:last-child  { border-radius: 0 6px 0 0; }
+  }
+
+  td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td      { background: #fafafa; }
+}
+
+/* ── Summary ── */
+.inv-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.inv-notes {
+  flex: 1;
+  padding-right: 2rem;
+}
+
+.note-title {
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.inv-notes ul {
+  padding-left: 1rem;
+  margin: 0;
+
+  li {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.inv-totals { min-width: 240px; }
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: #374151;
+
+  &.grand {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #1e1b4b;
+    border-top: 2px solid #1e1b4b;
+    border-bottom: none;
+    padding-top: 0.6rem;
+    margin-top: 0.25rem;
+  }
+}
+
+/* ── Footer ── */
+.inv-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.payment-status {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  &.ps-paid    { background: #d1fae5; color: #065f46; }
+  &.ps-pending { background: #fef3c7; color: #92400e; }
+  &.ps-failed  { background: #fee2e2; color: #991b1b; }
+}
+
+.inv-sign   { text-align: center; }
+.sign-line  { width: 120px; border-top: 1px solid #374151; margin: 0 auto 0.3rem; }
+.sign-label { font-size: 0.75rem; color: #6b7280; }
+
+/* ── Print ── */
+@media print {
+  .no-print      { display: none !important; }
+  .modal-overlay { position: static; background: none; padding: 0; }
+  .invoice-modal { box-shadow: none; border-radius: 0; }
+  .invoice-paper { padding: 0; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .inv-header   { flex-direction: column; gap: 1rem; }
+  .inv-meta     { text-align: left; }
+  .inv-parties  { grid-template-columns: 1fr; }
+  .inv-summary  { flex-direction: column; }
+  .inv-notes    { padding-right: 0; margin-bottom: 1rem; }
+  .invoice-actions { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .inv-table th,
+  .inv-table td { padding: 0.5rem; font-size: 0.7rem; }
+}

@@ -1,0 +1,169 @@
+<div class="wallet-page fade-in">
+  <div class="page-header">
+    <div>
+      <h1>Wallet & Earnings</h1>
+      <p>Track your revenue, payouts and transactions</p>
+    </div>
+    <button class="btn-withdraw" (click)="showWithdraw.set(true)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Withdraw Funds
+    </button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card earnings">
+      <div class="stat-icon">💰</div>
+      <div class="stat-body">
+        <span class="stat-val">₹{{ totalEarnings.toLocaleString() }}</span>
+        <span class="stat-lbl">Total Earnings</span>
+        <span class="stat-trend up">↑ 18.5% this month</span>
+      </div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-body">
+        <span class="stat-val">₹{{ pendingPayouts.toLocaleString() }}</span>
+        <span class="stat-lbl">Pending Payouts</span>
+      </div>
+    </div>
+    <div class="stat-card withdrawable">
+      <div class="stat-icon">🏦</div>
+      <div class="stat-body">
+        <span class="stat-val">₹{{ withdrawable.toLocaleString() }}</span>
+        <span class="stat-lbl">Withdrawable Amount</span>
+      </div>
+    </div>
+    <div class="stat-card refunds">
+      <div class="stat-icon">↩️</div>
+      <div class="stat-body">
+        <span class="stat-val">₹{{ totalRefunds.toLocaleString() }}</span>
+        <span class="stat-lbl">Total Refunds</span>
+      </div>
+    </div>
+    <div class="stat-card monthly">
+      <div class="stat-icon">📈</div>
+      <div class="stat-body">
+        <span class="stat-val">₹1,25,000</span>
+        <span class="stat-lbl">Monthly Earnings (Dec)</span>
+        <span class="stat-trend up">↑ Best month!</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="chart-card">
+      <h3>Monthly Revenue</h3>
+      <div class="bar-chart">
+        @for (val of monthlyData; track $index) {
+          <div class="bar-col">
+            <div class="bar-fill" [style.height.%]="barHeight(val)" [class.current]="$index === 11">
+              <span class="bar-tip">₹{{ (val/1000).toFixed(0) }}k</span>
+            </div>
+            <span class="bar-label">{{ months[$index] }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="payout-card">
+      <h3>Bank Account</h3>
+      <div class="bank-info">
+        <div class="bank-icon">🏦</div>
+        <div>
+          <div class="bank-name">HDFC Bank</div>
+          <div class="bank-acc">Account: ****4521</div>
+          <div class="bank-ifsc">IFSC: HDFC0001234</div>
+        </div>
+      </div>
+      <div class="payout-history">
+        <h4>Payout History</h4>
+        @if (loading()) {
+          <div class="skeleton-row"></div><div class="skeleton-row"></div>
+        } @else {
+          @for (p of payouts(); track p.id) {
+            <div class="payout-row">
+              <div>
+                <span class="payout-id">{{ p.id }}</span>
+                <span class="payout-date">{{ p.requestDate }}</span>
+              </div>
+              <div class="payout-right">
+                <span class="payout-amt">₹{{ p.amount.toLocaleString() }}</span>
+                <span class="pstatus" [class]="'ps-' + p.status">{{ p.status }}</span>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <h3>Recent Transactions</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Transaction ID</th><th>Order ID</th><th>Customer</th>
+            <th>Amount</th><th>Commission</th><th>Final Payout</th><th>Status</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            @for (i of [1,2,3,4]; track i) {
+              <tr><td colspan="8"><div class="skeleton-row"></div></td></tr>
+            }
+          } @else {
+            @for (t of transactions(); track t.id) {
+              <tr>
+                <td><code>{{ t.id }}</code></td>
+                <td><code>{{ t.orderId }}</code></td>
+                <td>{{ t.customer }}</td>
+                <td>₹{{ t.amount.toLocaleString() }}</td>
+                <td class="commission">-₹{{ t.commission }}</td>
+                <td class="payout-final">₹{{ t.finalPayout.toLocaleString() }}</td>
+                <td><span class="tstatus" [class]="'ts-' + t.status">{{ t.status }}</span></td>
+                <td>{{ t.date }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  @if (showWithdraw()) {
+    <div class="modal-overlay" (click)="showWithdraw.set(false)">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>Withdraw Funds</h3>
+          <button class="close-btn" (click)="showWithdraw.set(false)">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="withdraw-info">
+            <span>Available Balance</span>
+            <strong>₹{{ withdrawable.toLocaleString() }}</strong>
+          </div>
+          <form [formGroup]="withdrawForm" (ngSubmit)="requestWithdraw()">
+            <div class="form-group">
+              <label>Amount to Withdraw (₹)</label>
+              <input type="number" formControlName="amount" placeholder="Min ₹100" />
+              @if (withdrawForm.get('amount')?.invalid && withdrawForm.get('amount')?.touched) {
+                <span class="err">Minimum withdrawal is ₹100</span>
+              }
+            </div>
+            <div class="form-group">
+              <label>Bank Account</label>
+              <input value="HDFC Bank ****4521" readonly class="readonly" />
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" (click)="showWithdraw.set(false)">Cancel</button>
+              <button type="submit" class="btn-withdraw" [disabled]="withdrawing()">
+                {{ withdrawing() ? 'Processing...' : 'Request Payout' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

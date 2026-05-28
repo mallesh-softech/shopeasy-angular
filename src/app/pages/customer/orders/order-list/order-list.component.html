@@ -33,6 +33,9 @@
               <span class="order-price">{{ order.total | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
               <div class="order-actions">
                 <a [routerLink]="['/orders/track', order.id]" class="btn btn--primary btn--sm">Track Order</a>
+                @if (order.status === 'delivered') {
+                  <button type="button" class="btn btn--invoice btn--sm" (click)="invoiceOrder.set(order)">🧾 Invoice</button>
+                }
                 @if (!['delivered', 'cancelled'].includes(order.status)) {
                   <button type="button" class="btn btn--ghost btn--sm" (click)="cancelOrder(order.id)">Cancel</button>
                 }
@@ -44,3 +47,7 @@
     </div>
   }
 </div>
+
+@if (invoiceOrder()) {
+  <app-customer-invoice [order]="invoiceOrder()!" (close)="invoiceOrder.set(null)"></app-customer-invoice>
+}

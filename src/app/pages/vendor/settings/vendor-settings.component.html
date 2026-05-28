@@ -1,0 +1,101 @@
+<div class="settings-page fade-in">
+  <div class="page-header">
+    <h1>Settings</h1>
+    <p>Manage your account preferences and security</p>
+  </div>
+  <div class="settings-layout">
+    <div class="settings-tabs">
+      @for (tab of tabs; track tab.id) {
+        <button class="tab-item" [class.active]="activeTab() === tab.id" (click)="activeTab.set(tab.id)">
+          <span class="tab-icon" [innerHTML]="tab.icon"></span>
+          <span>{{ tab.label }}</span>
+        </button>
+      }
+    </div>
+    <div class="settings-content">
+      @if (activeTab() === 'general') {
+        <div class="settings-card">
+          <h3>General Settings</h3>
+          <div class="setting-row"><div class="setting-info"><strong>Store Name</strong><small>Your public store name visible to customers</small></div><input type="text" class="setting-input" value="TechMart Sellers" /></div>
+          <div class="setting-row"><div class="setting-info"><strong>Store Description</strong><small>Brief description of your store</small></div><textarea class="setting-input" rows="3">Premium electronics and accessories at best prices.</textarea></div>
+          <div class="setting-row"><div class="setting-info"><strong>Language</strong><small>Dashboard display language</small></div><select class="setting-input"><option>English</option><option>Hindi</option></select></div>
+          <div class="setting-row"><div class="setting-info"><strong>Currency</strong><small>Default currency for pricing</small></div><select class="setting-input"><option>INR (₹)</option><option>USD ($)</option></select></div>
+          <button class="btn-save">Save Changes</button>
+        </div>
+      }
+      @if (activeTab() === 'notifications') {
+        <div class="settings-card">
+          <h3>Notification Preferences</h3>
+          @for (notif of notifications; track notif.key) {
+            <div class="toggle-row">
+              <div class="toggle-info"><strong>{{ notif.label }}</strong><small>{{ notif.desc }}</small></div>
+              <label class="toggle-switch"><input type="checkbox" [checked]="notif.enabled" (change)="notif.enabled = !notif.enabled" /><span class="toggle-slider"></span></label>
+            </div>
+          }
+        </div>
+      }
+      @if (activeTab() === 'security') {
+        <div class="settings-card">
+          <h3>Change Password</h3>
+          <div class="form-group"><label>Current Password</label><input type="password" class="setting-input" placeholder="Enter current password" /></div>
+          <div class="form-group"><label>New Password</label><input type="password" class="setting-input" placeholder="Enter new password" /></div>
+          <div class="form-group"><label>Confirm New Password</label><input type="password" class="setting-input" placeholder="Confirm new password" /></div>
+          <button class="btn-save">Update Password</button>
+          <div class="divider"></div>
+          <h3>Two-Factor Authentication</h3>
+          <div class="tfa-card">
+            <div class="tfa-icon">🔐</div>
+            <div><strong>Enable 2FA</strong><p>Add an extra layer of security to your account</p></div>
+            <button class="btn-enable">Enable</button>
+          </div>
+        </div>
+      }
+      @if (activeTab() === 'bank') {
+        <div class="settings-card">
+          <h3>Bank Accounts</h3>
+          @for (account of bankAccounts(); track account.id) {
+            <div class="bank-card" [class.primary-card]="account.isPrimary">
+              <div class="bank-card-top">
+                <label class="primary-radio">
+                  <input type="radio" name="primaryBank" [checked]="account.isPrimary" (change)="setPrimary(account.id)" />
+                  <span class="radio-label">Set as Primary</span>
+                </label>
+                @if (account.isPrimary) { <span class="primary-tag">★ Primary</span> }
+                @if (account.verified) { <span class="verified-tag">✓ Verified</span> }
+                <button class="remove-bank-btn" (click)="removeAccount(account.id)" [disabled]="account.isPrimary" title="Cannot remove primary account">✕</button>
+              </div>
+              <div class="bank-header">
+                <span class="bank-icon">🏦</span>
+                <div><strong>{{ account.bankName }}</strong><small>{{ account.isPrimary ? 'Primary Account' : 'Secondary Account' }}</small></div>
+              </div>
+              <div class="bank-details">
+                <div><span>Account Holder</span><strong>{{ account.accountHolder }}</strong></div>
+                <div><span>Account Number</span><strong>{{ maskAccount(account.accountNumber) }}</strong></div>
+                <div><span>IFSC Code</span><strong>{{ account.ifscCode }}</strong></div>
+                <div><span>Bank Name</span><strong>{{ account.bankName }}</strong></div>
+              </div>
+            </div>
+          }
+          @if (!showAddForm()) {
+            <button class="btn-secondary" (click)="showAddForm.set(true)">+ Add New Bank Account</button>
+          } @else {
+            <div class="add-bank-form">
+              <h4>New Bank Account</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Account Holder Name *</label><input type="text" class="setting-input full" [(ngModel)]="newAccount.accountHolder" placeholder="As per bank records" /></div>
+                <div class="form-group"><label>Account Number *</label><input type="text" class="setting-input full" [(ngModel)]="newAccount.accountNumber" placeholder="Enter account number" /></div>
+                <div class="form-group"><label>IFSC Code *</label><input type="text" class="setting-input full" [(ngModel)]="newAccount.ifscCode" placeholder="e.g. SBIN0001234" /></div>
+                <div class="form-group"><label>Bank Name *</label><input type="text" class="setting-input full" [(ngModel)]="newAccount.bankName" placeholder="e.g. State Bank of India" /></div>
+              </div>
+              @if (addError()) { <p class="form-error">{{ addError() }}</p> }
+              <div class="form-actions">
+                <button class="btn-cancel" (click)="cancelAdd()">Cancel</button>
+                <button class="btn-save" (click)="addAccount()">Save Account</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

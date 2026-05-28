@@ -1,0 +1,122 @@
+<div class="orders-page fade-in">
+  <div class="page-header">
+    <div>
+      <h1>Order Management</h1>
+      <p>Track and manage all your orders</p>
+    </div>
+  </div>
+
+  <div class="status-tabs">
+    @for (tab of tabs; track tab.value) {
+      <button class="tab-btn" [class.active]="activeTab() === tab.value" (click)="setTab(tab.value)">
+        {{ tab.label }}
+        <span class="tab-count">{{ getCount(tab.value) }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by order ID or customer..." (input)="onSearch($event)" />
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          @for (i of [1,2,3,4,5]; track i) {
+            <tr><td colspan="8"><div class="skeleton-row"></div></td></tr>
+          }
+        } @else if (filtered().length === 0) {
+          <tr><td colspan="8" class="empty-cell">No orders found</td></tr>
+        } @else {
+          @for (order of filtered(); track order.id) {
+            <tr>
+              <td><code>{{ order.id }}</code></td>
+              <td>
+                <div class="customer-cell">
+                  <div class="avatar">{{ order.customerName[0] }}</div>
+                  <div>
+                    <span class="customer-name">{{ order.customerName }}</span>
+                    <span class="customer-email">{{ order.customerEmail }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="product-cell">
+                  <img [src]="order.productImage" [alt]="order.product" />
+                  <span>{{ order.product }}</span>
+                </div>
+              </td>
+              <td><strong>₹{{ order.amount.toLocaleString() }}</strong></td>
+              <td><span class="payment-badge" [class]="'pay-' + order.paymentStatus">{{ order.paymentStatus }}</span></td>
+              <td><span class="status-badge" [class]="'status-' + order.deliveryStatus">{{ order.deliveryStatus }}</span></td>
+              <td>{{ order.orderDate }}</td>
+              <td>
+                <div class="action-menu">
+                  @if (order.deliveryStatus === 'pending') {
+                    <button class="action-btn accept" (click)="updateStatus(order, 'accepted')">Accept</button>
+                    <button class="action-btn reject" (click)="updateStatus(order, 'rejected')">Reject</button>
+                  }
+                  @if (order.deliveryStatus === 'accepted') {
+                    <button class="action-btn pack" (click)="updateStatus(order, 'packed')">Pack</button>
+                  }
+                  @if (order.deliveryStatus === 'packed') {
+                    <button class="action-btn ship" (click)="updateStatus(order, 'shipped')">Ship</button>
+                  }
+                  @if (order.deliveryStatus === 'shipped') {
+                    <button class="action-btn deliver" (click)="updateStatus(order, 'delivered')">Delivered</button>
+                  }
+                  <button class="action-btn view" (click)="viewOrder(order)">View</button>
+                  <button class="action-btn invoice" (click)="viewInvoice(order)">Invoice</button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (invoiceOrder()) {
+    <app-invoice-preview [order]="invoiceOrder()!" (close)="invoiceOrder.set(null)"></app-invoice-preview>
+  }
+
+  @if (selectedOrder()) {
+    <div class="modal-overlay" (click)="selectedOrder.set(null)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Order Details</h3>
+          <button class="close-btn" (click)="selectedOrder.set(null)">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-row"><span>Order ID</span><strong>{{ selectedOrder()!.id }}</strong></div>
+          <div class="detail-row"><span>Customer</span><strong>{{ selectedOrder()!.customerName }}</strong></div>
+          <div class="detail-row"><span>Email</span><strong>{{ selectedOrder()!.customerEmail }}</strong></div>
+          <div class="detail-row"><span>Product</span><strong>{{ selectedOrder()!.product }}</strong></div>
+          <div class="detail-row"><span>Amount</span><strong>₹{{ selectedOrder()!.amount.toLocaleString() }}</strong></div>
+          <div class="detail-row"><span>Payment</span><strong>{{ selectedOrder()!.paymentStatus }}</strong></div>
+          <div class="detail-row"><span>Delivery Status</span><strong>{{ selectedOrder()!.deliveryStatus }}</strong></div>
+          <div class="detail-row"><span>Order Date</span><strong>{{ selectedOrder()!.orderDate }}</strong></div>
+          <div class="detail-row"><span>Shipping Address</span><strong>{{ selectedOrder()!.shippingAddress }}</strong></div>
+          <div class="timeline">
+            <h4>Order Timeline</h4>
+            @for (step of getTimeline(selectedOrder()!.deliveryStatus); track step.label) {
+              <div class="timeline-step" [class.done]="step.done" [class.current]="step.current">
+                <div class="timeline-dot"></div>
+                <span>{{ step.label }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

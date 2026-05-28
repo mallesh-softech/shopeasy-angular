@@ -1,0 +1,130 @@
+<div class="profile-page fade-in">
+  <div class="page-header">
+    <h1>Vendor Profile</h1>
+    <p>Manage your shop and business information</p>
+  </div>
+
+  <div class="profile-layout">
+    <div class="profile-sidebar">
+      <div class="shop-card">
+        <div class="shop-banner"></div>
+        <div class="shop-logo-wrap">
+          <div class="shop-logo">{{ vendor()?.businessName?.[0] || 'S' }}</div>
+          <button class="edit-logo-btn">📷</button>
+        </div>
+        <div class="shop-info">
+          <h3>{{ vendor()?.businessName }}</h3>
+          <p>{{ vendor()?.businessType }}</p>
+          <div class="verification-badge" [class.verified]="vendor()?.status === 'approved'">
+            {{ vendor()?.status === 'approved' ? '✓ Verified Seller' : '⏳ Pending Verification' }}
+          </div>
+        </div>
+        <div class="shop-stats">
+          <div class="shop-stat"><strong>4.8</strong><span>Rating</span></div>
+          <div class="shop-stat"><strong>1,247</strong><span>Orders</span></div>
+          <div class="shop-stat"><strong>6</strong><span>Products</span></div>
+        </div>
+      </div>
+      <button class="btn-export-csv" (click)="exportCSV()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export All Data (CSV)
+      </button>
+    </div>
+
+    <div class="profile-main">
+      <div class="info-card">
+        <div class="card-header">
+          <h3>Business Information</h3>
+          <button class="edit-btn" (click)="editing.set(!editing())">{{ editing() ? 'Cancel' : '✏️ Edit' }}</button>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Business Name</span>
+            @if (editing()) { <input type="text" class="info-input" [(ngModel)]="editBiz.businessName" /> }
+            @else { <strong>{{ vendor()?.businessName }}</strong> }
+          </div>
+          <div class="info-item">
+            <span class="info-label">Owner Name</span>
+            @if (editing()) { <input type="text" class="info-input" [(ngModel)]="editBiz.ownerName" /> }
+            @else { <strong>{{ vendor()?.ownerName }}</strong> }
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <strong>{{ vendor()?.email }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Phone</span>
+            @if (editing()) { <input type="tel" class="info-input" [(ngModel)]="editBiz.phone" /> }
+            @else { <strong>{{ vendor()?.phone }}</strong> }
+          </div>
+          <div class="info-item">
+            <span class="info-label">GST Number</span>
+            <strong>{{ vendor()?.gstNumber }}</strong>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Business Type</span>
+            <strong>{{ vendor()?.businessType }}</strong>
+          </div>
+        </div>
+        @if (editing()) {
+          <div class="save-row">
+            <button class="btn-save" (click)="saveBiz()">Save Changes</button>
+          </div>
+        }
+      </div>
+
+      <div class="info-card">
+        <div class="card-header">
+          <h3>Business Address</h3>
+          <button class="edit-btn" (click)="editingAddr.set(!editingAddr())">{{ editingAddr() ? 'Cancel' : '✏️ Edit' }}</button>
+        </div>
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="info-label">Address</span>
+            @if (editingAddr()) { <input type="text" class="info-input" [(ngModel)]="editAddr.address" placeholder="Street address" /> }
+            @else { <strong>{{ address.address }}</strong> }
+          </div>
+          <div class="info-item">
+            <span class="info-label">City</span>
+            @if (editingAddr()) { <input type="text" class="info-input" [(ngModel)]="editAddr.city" /> }
+            @else { <strong>{{ address.city }}</strong> }
+          </div>
+          <div class="info-item">
+            <span class="info-label">State</span>
+            @if (editingAddr()) {
+              <select class="info-input" [(ngModel)]="editAddr.state">
+                @for (s of states; track s) { <option>{{ s }}</option> }
+              </select>
+            } @else { <strong>{{ address.state }}</strong> }
+          </div>
+          <div class="info-item">
+            <span class="info-label">Pincode</span>
+            @if (editingAddr()) { <input type="text" class="info-input" [(ngModel)]="editAddr.pincode" /> }
+            @else { <strong>{{ address.pincode }}</strong> }
+          </div>
+        </div>
+        @if (editingAddr()) {
+          <div class="save-row">
+            <button class="btn-save" (click)="saveAddr()">Save Address</button>
+          </div>
+        }
+      </div>
+
+      <div class="info-card">
+        <div class="card-header"><h3>Document Verification</h3></div>
+        <div class="docs-list">
+          @for (doc of documents; track doc.name) {
+            <div class="doc-item">
+              <span class="doc-icon">📄</span>
+              <div class="doc-info">
+                <strong>{{ doc.name }}</strong>
+                <small>{{ doc.status }}</small>
+              </div>
+              <span class="doc-badge" [class]="'doc-' + doc.type">{{ doc.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
