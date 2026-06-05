@@ -1,0 +1,143 @@
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Customer Management</h1>
+      <p class="page-sub">Monitor and manage all platform customers</p>
+    </div>
+    <div class="header-stats">
+      <div class="mini-stat"><span class="ms-val">{{ customers().length }}</span><span class="ms-lbl">Total</span></div>
+      <div class="mini-stat"><span class="ms-val">{{ activeCount() }}</span><span class="ms-lbl">Active</span></div>
+      <div class="mini-stat warn"><span class="ms-val">{{ blockedCount() }}</span><span class="ms-lbl">Blocked</span></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search customers..." [(ngModel)]="searchQuery" />
+    </div>
+    <div class="filter-tabs">
+      @for (s of statuses; track s) {
+        <button class="filter-tab" [class.active]="activeStatus() === s" (click)="activeStatus.set(s)">{{ s }}</button>
+      }
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Customer</th><th>Contact</th><th>Orders</th><th>Total Spent</th><th>Status</th><th>Joined</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of filtered(); track c.id) {
+          <tr>
+            <td>
+              <div class="customer-cell">
+                <div class="customer-avatar">{{ c.name[0] }}</div>
+                <span class="customer-name">{{ c.name }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="contact-cell">
+                <span>{{ c.email }}</span>
+                <span class="phone">{{ c.phone }}</span>
+              </div>
+            </td>
+            <td class="num-cell">{{ c.ordersCount }}</td>
+            <td class="num-cell">₹{{ c.totalSpent | number }}</td>
+            <td><span class="status-badge" [class]="'status-' + c.status">{{ c.status }}</span></td>
+            <td class="date-cell">{{ c.joinedAt }}</td>
+            <td>
+              <div class="action-menu">
+                <button class="action-btn perf" (click)="openProfile(c)">Performance</button>
+                @if (c.status === 'active') {
+                  <button class="action-btn warn" (click)="toggleBlock(c)">Block</button>
+                } @else {
+                  <button class="action-btn success" (click)="toggleBlock(c)">Unblock</button>
+                }
+                <button class="action-btn danger" (click)="deleteCustomer(c.id)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!filtered().length) {
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <p>No customers found</p>
+      </div>
+    }
+  </div>
+</div>
+
+@if (profileCustomer()) {
+  <div class="modal-backdrop" (click)="closeProfile()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-cust-info">
+          <div class="cust-avatar-lg">{{ profileCustomer()!.name[0] }}</div>
+          <div>
+            <h2>{{ profileCustomer()!.name }}</h2>
+            <span class="modal-sub">{{ profileCustomer()!.email }}</span>
+          </div>
+        </div>
+        <button class="close-btn" (click)="closeProfile()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Overview</button>
+        <button class="tab-btn" [class.active]="activeTab() === 'orders'" (click)="activeTab.set('orders')">Orders</button>
+      </div>
+
+      @if (activeTab() === 'overview') {
+        <div class="tab-body">
+          <div class="overview-grid">
+            <div class="ov-item"><span class="ov-label">Full Name</span><span class="ov-value">{{ profileCustomer()!.name }}</span></div>
+            <div class="ov-item"><span class="ov-label">Phone Number</span><span class="ov-value">{{ profileCustomer()!.phone }}</span></div>
+            <div class="ov-item"><span class="ov-label">Email Address</span><span class="ov-value">{{ profileCustomer()!.email }}</span></div>
+            <div class="ov-item"><span class="ov-label">Member Since</span><span class="ov-value">{{ profileCustomer()!.joinedAt }}</span></div>
+            <div class="ov-item"><span class="ov-label">Account Status</span><span class="status-badge" [class]="'status-' + profileCustomer()!.status">{{ profileCustomer()!.status }}</span></div>
+            <div class="ov-item"><span class="ov-label">Total Spent</span><span class="ov-value highlight">&#8377;{{ profileCustomer()!.totalSpent | number }}</span></div>
+          </div>
+          <div class="address-box">
+            <div class="addr-label">Shipping Address</div>
+            <div class="addr-value">{{ custDetail()!.address }}, {{ custDetail()!.city }}, {{ custDetail()!.state }} - {{ custDetail()!.pincode }}</div>
+          </div>
+          <div class="ov-stats">
+            <div class="ov-stat-card"><div class="ov-stat-val">{{ profileCustomer()!.ordersCount }}</div><div class="ov-stat-lbl">Total Orders</div></div>
+            <div class="ov-stat-card"><div class="ov-stat-val">{{ custOrders().length }}</div><div class="ov-stat-lbl">Order Records</div></div>
+            <div class="ov-stat-card"><div class="ov-stat-val">{{ deliveredCount() }}</div><div class="ov-stat-lbl">Delivered</div></div>
+            <div class="ov-stat-card warn"><div class="ov-stat-val">{{ returnedCount() }}</div><div class="ov-stat-lbl">Returned</div></div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab() === 'orders') {
+        <div class="tab-body orders-tab">
+          @for (o of custOrders(); track o.id) {
+            <div class="order-row">
+              <div class="order-left">
+                <div class="order-id">#{{ o.id }}</div>
+                <div class="order-product">{{ o.product }}</div>
+                <div class="order-vendor">{{ o.vendor }}</div>
+              </div>
+              <div class="order-right">
+                <div class="order-amount">&#8377;{{ o.amount | number }}</div>
+                <div class="order-date">{{ o.date }}</div>
+                <div class="order-badges">
+                  <span class="del-badge" [class]="'del-' + o.deliveryStatus">{{ o.deliveryStatus }}</span>
+                  <span class="pay-badge" [class]="'pay-' + o.paymentStatus">{{ o.paymentStatus }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

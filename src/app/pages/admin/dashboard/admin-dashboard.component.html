@@ -1,0 +1,163 @@
+<div class="dashboard fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Welcome back! Here's what's happening on your platform.</p>
+    </div>
+    <div class="header-actions">
+      <span class="live-badge">
+        <span class="live-dot"></span> Live
+      </span>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="skeleton-card"></div>
+      }
+    </div>
+  } @else if (stats()) {
+    <div class="stats-grid">
+      <div class="stat-card purple">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Orders</span>
+          <span class="stat-value">{{ stats()!.totalOrders | number }}</span>
+          <span class="stat-growth positive">+{{ stats()!.ordersGrowth }}% this month</span>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Revenue</span>
+          <span class="stat-value">₹{{ (stats()!.totalRevenue / 100000).toFixed(1) }}L</span>
+          <span class="stat-growth positive">+{{ stats()!.revenueGrowth }}% this month</span>
+        </div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Vendors</span>
+          <span class="stat-value">{{ stats()!.totalVendors }}</span>
+          <span class="stat-growth neutral">{{ stats()!.pendingVendorRequests }} pending approval</span>
+        </div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Customers</span>
+          <span class="stat-value">{{ (stats()!.totalCustomers / 1000).toFixed(1) }}K</span>
+          <span class="stat-growth positive">Growing steadily</span>
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="stat-info">
+          <span class="stat-label">Pending Requests</span>
+          <span class="stat-value">{{ stats()!.pendingVendorRequests }}</span>
+          <span class="stat-growth warning">Needs attention</span>
+        </div>
+      </div>
+      <div class="stat-card indigo">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div>
+        <div class="stat-info">
+          <span class="stat-label">Active Products</span>
+          <span class="stat-value">{{ (stats()!.activeProducts / 1000).toFixed(1) }}K</span>
+          <span class="stat-growth positive">Across all vendors</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="dashboard-grid">
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Revenue Analytics</h3>
+        <div class="period-tabs">
+          @for (p of periods; track p) {
+            <button class="period-tab" [class.active]="activePeriod() === p" (click)="activePeriod.set(p)">{{ p }}</button>
+          }
+        </div>
+      </div>
+      <div class="chart-area">
+        @if (revenueData().length) {
+          <div class="bar-chart">
+            @for (d of revenueData(); track d.label) {
+              <div class="bar-col">
+                <div class="bar-wrap">
+                  <div class="bar" [style.height.%]="(d.revenue / maxRevenue()) * 100" [title]="'₹' + (d.revenue/1000).toFixed(0) + 'K'"></div>
+                </div>
+                <span class="bar-label">{{ d.label }}</span>
+              </div>
+            }
+          </div>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="legend-dot purple"></span>Revenue</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="card-header">
+        <h3>Pending Vendor Approvals</h3>
+        <a routerLink="/admin/vendors/requests" class="view-all">View all</a>
+      </div>
+      @for (req of pendingRequests(); track req.id) {
+        <div class="approval-item">
+          <div class="approval-avatar">{{ req.businessName[0] }}</div>
+          <div class="approval-info">
+            <span class="approval-name">{{ req.businessName }}</span>
+            <span class="approval-meta">{{ req.businessType }} · {{ req.submittedAt }}</span>
+          </div>
+          <div class="approval-actions">
+            <button class="btn-approve">Approve</button>
+            <button class="btn-reject">Reject</button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="panel-card">
+      <div class="card-header">
+        <h3>Recent Orders</h3>
+        <a routerLink="/admin/orders" class="view-all">View all</a>
+      </div>
+      <div class="table-wrap">
+        <table class="mini-table">
+          <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (order of recentOrders(); track order.id) {
+              <tr>
+                <td class="order-id">{{ order.id }}</td>
+                <td>{{ order.customerName }}</td>
+                <td>₹{{ order.amount | number }}</td>
+                <td><span class="badge" [class]="'badge-' + order.deliveryStatus">{{ order.deliveryStatus }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="card-header"><h3>Platform Activity</h3></div>
+      <div class="activity-list">
+        @for (a of activities; track a.id) {
+          <div class="activity-item">
+            <div class="activity-icon" [class]="a.type">
+              <span [innerHTML]="a.icon"></span>
+            </div>
+            <div class="activity-info">
+              <span class="activity-text">{{ a.text }}</span>
+              <span class="activity-time">{{ a.time }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

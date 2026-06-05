@@ -1,0 +1,79 @@
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Vendor Requests</h1>
+      <p class="page-sub">Review and manage vendor registration requests</p>
+    </div>
+    <a routerLink="/admin/vendors" class="btn-secondary">View All Vendors</a>
+  </div>
+
+  <div class="filter-bar">
+    @for (s of statuses; track s.value) {
+      <button class="filter-btn" [class.active]="activeStatus() === s.value" (click)="activeStatus.set(s.value)">
+        {{ s.label }} <span class="filter-count">{{ getCount(s.value) }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="requests-list">
+    @for (req of filtered(); track req.id) {
+      <div class="request-card">
+        <div class="request-header">
+          <div class="vendor-avatar">{{ req.businessName[0] }}</div>
+          <div class="vendor-info">
+            <h3>{{ req.businessName }}</h3>
+            <span class="vendor-owner">{{ req.ownerName }}</span>
+          </div>
+          <span class="status-badge" [class]="'status-' + req.status">{{ req.status }}</span>
+        </div>
+        <div class="request-details">
+          <div class="detail-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            {{ req.email }}
+          </div>
+          <div class="detail-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+            {{ req.phone }}
+          </div>
+          <div class="detail-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            {{ req.businessType }}
+          </div>
+          <div class="detail-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+            GST: {{ req.gstNumber }}
+          </div>
+        </div>
+        <div class="request-footer">
+          <div class="docs">
+            @for (doc of req.documents; track doc) {
+              <span class="doc-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+                {{ doc }}
+              </span>
+            }
+          </div>
+          <span class="submitted-date">Submitted: {{ req.submittedAt }}</span>
+          @if (req.status === 'pending') {
+            <div class="action-btns">
+              <button class="btn-approve" (click)="updateStatus(req, 'approved')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Approve
+              </button>
+              <button class="btn-reject" (click)="updateStatus(req, 'rejected')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Reject
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    @if (!filtered().length) {
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <p>No requests found</p>
+      </div>
+    }
+  </div>
+</div>

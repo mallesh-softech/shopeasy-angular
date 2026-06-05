@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { vendorAuthGuard, vendorGuestGuard } from './core/guards/vendor-auth.guard';
+import { adminAuthGuard, adminGuestGuard } from './core/guards/admin-auth.guard';
 
 export const routes: Routes = [
   {
@@ -280,6 +281,111 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/vendor/settings/vendor-settings.component').then(
                 (m) => m.VendorSettingsComponent
+              ),
+          },
+        ],
+      },
+    ],
+  },
+
+  {
+    path: 'admin',
+    children: [
+      {
+        path: 'auth',
+        canActivate: [adminGuestGuard],
+        loadComponent: () =>
+          import('./layouts/admin-layout/admin-auth-layout.component').then(
+            (m) => m.AdminAuthLayoutComponent
+          ),
+        children: [
+          { path: '', redirectTo: 'login', pathMatch: 'full' },
+          {
+            path: 'login',
+            loadComponent: () =>
+              import('./pages/admin/auth/login/admin-login.component').then(
+                (m) => m.AdminLoginComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: '',
+        canActivate: [adminAuthGuard],
+        loadComponent: () =>
+          import('./layouts/admin-layout/admin-layout.component').then(
+            (m) => m.AdminLayoutComponent
+          ),
+        children: [
+          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./pages/admin/dashboard/admin-dashboard.component').then(
+                (m) => m.AdminDashboardComponent
+              ),
+          },
+          {
+            path: 'vendors/requests',
+            loadComponent: () =>
+              import('./pages/admin/vendor-management/admin-vendor-requests.component').then(
+                (m) => m.AdminVendorRequestsComponent
+              ),
+          },
+          {
+            path: 'vendors',
+            loadComponent: () =>
+              import('./pages/admin/vendor-management/admin-vendors.component').then(
+                (m) => m.AdminVendorsComponent
+              ),
+          },
+          {
+            path: 'customers',
+            loadComponent: () =>
+              import('./pages/admin/customer-management/admin-customers.component').then(
+                (m) => m.AdminCustomersComponent
+              ),
+          },
+          {
+            path: 'products',
+            loadComponent: () =>
+              import('./pages/admin/products/admin-products.component').then(
+                (m) => m.AdminProductsComponent
+              ),
+          },
+          {
+            path: 'orders',
+            loadComponent: () =>
+              import('./pages/admin/orders/admin-orders.component').then(
+                (m) => m.AdminOrdersComponent
+              ),
+          },
+          {
+            path: 'payments',
+            loadComponent: () =>
+              import('./pages/admin/payments/admin-payments.component').then(
+                (m) => m.AdminPaymentsComponent
+              ),
+          },
+          {
+            path: 'reports',
+            loadComponent: () =>
+              import('./pages/admin/reports/admin-reports.component').then(
+                (m) => m.AdminReportsComponent
+              ),
+          },
+          {
+            path: 'settings',
+            loadComponent: () =>
+              import('./pages/admin/settings/admin-settings.component').then(
+                (m) => m.AdminSettingsComponent
+              ),
+          },
+          {
+            path: 'profile',
+            loadComponent: () =>
+              import('./pages/admin/profile/admin-profile.component').then(
+                (m) => m.AdminProfileComponent
               ),
           },
         ],

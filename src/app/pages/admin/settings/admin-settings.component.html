@@ -1,0 +1,139 @@
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Platform Settings</h1>
+      <p class="page-sub">Configure categories, coupons, taxes and platform settings</p>
+    </div>
+  </div>
+
+  <div class="settings-tabs">
+    @for (t of tabs; track t) {
+      <button class="settings-tab" [class.active]="activeTab() === t" (click)="activeTab.set(t)">{{ t }}</button>
+    }
+  </div>
+
+  @if (activeTab() === 'Categories') {
+    <div class="settings-section fade-in">
+      <div class="section-header">
+        <h3>Manage Categories</h3>
+        <button class="btn-add" (click)="addCategory()">+ Add Category</button>
+      </div>
+      <div class="categories-grid">
+        @for (cat of categories(); track cat.id) {
+          <div class="category-card" [class.inactive]="!cat.active">
+            <div class="cat-icon">{{ cat.icon }}</div>
+            <span class="cat-name">{{ cat.name }}</span>
+            <div class="cat-actions">
+              <button class="icon-action" [class]="cat.active ? 'warn' : 'success'" (click)="toggleCategory(cat)">
+                {{ cat.active ? 'Disable' : 'Enable' }}
+              </button>
+              <button class="icon-action danger" (click)="deleteCategory(cat.id)">Delete</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'Coupons') {
+    <div class="settings-section fade-in">
+      <div class="section-header">
+        <h3>Manage Coupons</h3>
+        <button class="btn-add" (click)="addCoupon()">+ Add Coupon</button>
+      </div>
+      <div class="table-card">
+        <table class="data-table">
+          <thead><tr><th>Code</th><th>Discount</th><th>Min Order</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            @for (c of coupons(); track c.id) {
+              <tr>
+                <td class="coupon-code">{{ c.code }}</td>
+                <td>{{ c.type === 'percent' ? c.discount + '%' : '₹' + c.discount }}</td>
+                <td>₹{{ c.minOrder }}</td>
+                <td><span class="status-badge" [class]="c.active ? 'status-active' : 'status-inactive'">{{ c.active ? 'Active' : 'Inactive' }}</span></td>
+                <td>
+                  <div class="action-menu">
+                    <button class="action-btn" [class]="c.active ? 'warn' : 'success'" (click)="toggleCoupon(c)">{{ c.active ? 'Disable' : 'Enable' }}</button>
+                    <button class="action-btn danger" (click)="deleteCoupon(c.id)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'Tax & Shipping') {
+    <div class="settings-section fade-in">
+      <div class="config-grid">
+        <div class="config-card">
+          <h4>Tax Configuration</h4>
+          <div class="config-row">
+            <label>GST Rate (%)</label>
+            <input type="number" [(ngModel)]="taxRate" class="config-input" />
+          </div>
+          <div class="config-row">
+            <label>Tax Inclusive Pricing</label>
+            <label class="toggle"><input type="checkbox" [(ngModel)]="taxInclusive" /><span class="toggle-slider"></span></label>
+          </div>
+          <button class="btn-save">Save Tax Settings</button>
+        </div>
+        <div class="config-card">
+          <h4>Shipping Configuration</h4>
+          <div class="config-row">
+            <label>Free Shipping Above (₹)</label>
+            <input type="number" [(ngModel)]="freeShippingThreshold" class="config-input" />
+          </div>
+          <div class="config-row">
+            <label>Standard Shipping Fee (₹)</label>
+            <input type="number" [(ngModel)]="shippingFee" class="config-input" />
+          </div>
+          <button class="btn-save">Save Shipping Settings</button>
+        </div>
+        <div class="config-card">
+          <h4>Platform Commission</h4>
+          <div class="config-row">
+            <label>Commission Rate (%)</label>
+            <input type="number" [(ngModel)]="commissionRate" class="config-input" />
+          </div>
+          <div class="config-row">
+            <label>Payout Cycle</label>
+            <select [(ngModel)]="payoutCycle" class="config-input">
+              <option>Weekly</option>
+              <option>Bi-weekly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+          <button class="btn-save">Save Commission Settings</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'Banners') {
+    <div class="settings-section fade-in">
+      <div class="section-header">
+        <h3>Homepage Banners</h3>
+        <button class="btn-add">+ Upload Banner</button>
+      </div>
+      <div class="banners-grid">
+        @for (b of banners; track b.id) {
+          <div class="banner-card">
+            <div class="banner-preview" [style.background]="b.bg">
+              <span class="banner-title">{{ b.title }}</span>
+            </div>
+            <div class="banner-footer">
+              <span class="banner-status" [class]="b.active ? 'active' : 'inactive'">{{ b.active ? 'Active' : 'Inactive' }}</span>
+              <div class="banner-actions">
+                <button class="icon-action warn">Edit</button>
+                <button class="icon-action danger">Delete</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,9 @@
+<div class="admin-layout" [class.sidebar-collapsed]="sidebarCollapsed()">
+  <app-admin-sidebar [collapsed]="sidebarCollapsed()" (toggleSidebar)="sidebarCollapsed.set(!sidebarCollapsed())" />
+  <div class="admin-main">
+    <app-admin-topbar />
+    <main class="admin-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

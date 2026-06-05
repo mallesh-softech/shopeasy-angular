@@ -1,0 +1,125 @@
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reports & Analytics</h1>
+      <p class="page-sub">Platform performance insights and growth metrics</p>
+    </div>
+    <div class="export-btns">
+      <button class="export-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <button class="export-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+        Export PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="period-bar">
+    @for (p of periods; track p) {
+      <button class="period-btn" [class.active]="activePeriod() === p" (click)="activePeriod.set(p)">{{ p }}</button>
+    }
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Total Revenue</span><span class="kpi-trend up">↑ 18.7%</span></div>
+      <div class="kpi-value">₹48.2L</div>
+      <div class="kpi-bar"><div class="kpi-fill" style="width: 78%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Total Orders</span><span class="kpi-trend up">↑ 12.4%</span></div>
+      <div class="kpi-value">12,847</div>
+      <div class="kpi-bar"><div class="kpi-fill blue" style="width: 65%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">New Customers</span><span class="kpi-trend up">↑ 9.2%</span></div>
+      <div class="kpi-value">3,241</div>
+      <div class="kpi-bar"><div class="kpi-fill teal" style="width: 55%"></div></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Avg Order Value</span><span class="kpi-trend down">↓ 2.1%</span></div>
+      <div class="kpi-value">₹3,752</div>
+      <div class="kpi-bar"><div class="kpi-fill orange" style="width: 42%"></div></div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card wide">
+      <div class="card-header"><h3>Revenue Trend</h3></div>
+      <div class="chart-area">
+        @if (revenueData().length) {
+          <div class="bar-chart">
+            @for (d of revenueData(); track d.label) {
+              <div class="bar-col">
+                <div class="bar-wrap">
+                  <div class="bar" [style.height.%]="(d.revenue / maxRevenue()) * 100">
+                    <span class="bar-tooltip">₹{{ (d.revenue/1000).toFixed(0) }}K</span>
+                  </div>
+                </div>
+                <span class="bar-label">{{ d.label }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><h3>Top Categories</h3></div>
+      <div class="category-list">
+        @for (c of categories; track c.name) {
+          <div class="category-item">
+            <div class="cat-info">
+              <span class="cat-name">{{ c.name }}</span>
+              <span class="cat-pct">{{ c.pct }}%</span>
+            </div>
+            <div class="cat-bar"><div class="cat-fill" [style.width.%]="c.pct" [style.background]="c.color"></div></div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="card-header"><h3>Vendor Performance</h3></div>
+      <div class="vendor-perf-list">
+        @for (v of topVendors; track v.name) {
+          <div class="vendor-perf-item">
+            <div class="vp-avatar">{{ v.name[0] }}</div>
+            <div class="vp-info">
+              <span class="vp-name">{{ v.name }}</span>
+              <span class="vp-rev">₹{{ v.revenue }}</span>
+            </div>
+            <div class="vp-bar-wrap"><div class="vp-bar" [style.width.%]="v.pct"></div></div>
+            <span class="vp-pct">{{ v.pct }}%</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header"><h3>Order Status Distribution</h3></div>
+      <div class="donut-chart">
+        <div class="donut-visual">
+          <div class="donut-ring"></div>
+          <div class="donut-center">
+            <span class="donut-val">12,847</span>
+            <span class="donut-lbl">Orders</span>
+          </div>
+        </div>
+        <div class="donut-legend">
+          @for (s of orderStatuses; track s.label) {
+            <div class="legend-item">
+              <span class="legend-dot" [style.background]="s.color"></span>
+              <span class="legend-label">{{ s.label }}</span>
+              <span class="legend-val">{{ s.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

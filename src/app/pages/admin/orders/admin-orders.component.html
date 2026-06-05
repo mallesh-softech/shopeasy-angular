@@ -1,0 +1,59 @@
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Orders Management</h1>
+      <p class="page-sub">Track and manage all platform orders</p>
+    </div>
+    <div class="order-summary">
+      @for (s of summary; track s.label) {
+        <div class="summary-chip" [class]="s.cls">
+          <span class="chip-val">{{ s.count }}</span>
+          <span class="chip-lbl">{{ s.label }}</span>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search by order ID or customer..." [(ngModel)]="searchQuery" />
+    </div>
+    <div class="filter-tabs">
+      @for (s of deliveryStatuses; track s) {
+        <button class="filter-tab" [class.active]="activeStatus() === s" (click)="activeStatus.set(s)">{{ s }}</button>
+      }
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order ID</th><th>Customer</th><th>Vendor</th><th>Amount</th>
+          <th>Payment</th><th>Delivery</th><th>Date</th><th>Items</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of filtered(); track o.id) {
+          <tr>
+            <td class="order-id">{{ o.id }}</td>
+            <td class="name-cell">{{ o.customerName }}</td>
+            <td class="name-cell vendor">{{ o.vendorName }}</td>
+            <td class="num-cell">₹{{ o.amount | number }}</td>
+            <td><span class="badge" [class]="'pay-' + o.paymentStatus">{{ o.paymentStatus }}</span></td>
+            <td><span class="badge" [class]="'del-' + o.deliveryStatus">{{ o.deliveryStatus }}</span></td>
+            <td class="date-cell">{{ o.orderDate }}</td>
+            <td class="num-cell">{{ o.items }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!filtered().length) {
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+        <p>No orders found</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="page fade-in">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Payments Management</h1>
+      <p class="page-sub">Monitor transactions, payouts and refunds</p>
+    </div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="sum-card green">
+      <div class="sum-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div><div class="sum-val">₹{{ successTotal() | number }}</div><div class="sum-lbl">Successful Payments</div></div>
+    </div>
+    <div class="sum-card orange">
+      <div class="sum-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+      <div><div class="sum-val">{{ pendingCount() }}</div><div class="sum-lbl">Pending Payouts</div></div>
+    </div>
+    <div class="sum-card purple">
+      <div class="sum-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
+      <div><div class="sum-val">{{ refundCount() }}</div><div class="sum-lbl">Refunds Processed</div></div>
+    </div>
+    <div class="sum-card red">
+      <div class="sum-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+      <div><div class="sum-val">{{ failedCount() }}</div><div class="sum-lbl">Failed Payments</div></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="filter-tabs">
+      @for (t of types; track t) {
+        <button class="filter-tab" [class.active]="activeType() === t" (click)="activeType.set(t)">{{ t }}</button>
+      }
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Transaction ID</th><th>Order ID</th><th>Party</th><th>Amount</th>
+          <th>Type</th><th>Method</th><th>Status</th><th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of filtered(); track p.id) {
+          <tr>
+            <td class="txn-id">{{ p.id }}</td>
+            <td class="order-id">{{ p.orderId || '—' }}</td>
+            <td class="name-cell">{{ p.customerName || p.vendorName }}</td>
+            <td class="num-cell">₹{{ p.amount | number }}</td>
+            <td><span class="type-badge" [class]="'type-' + p.type">{{ p.type }}</span></td>
+            <td class="method-cell">{{ p.method }}</td>
+            <td><span class="status-badge" [class]="'status-' + p.status">{{ p.status }}</span></td>
+            <td class="date-cell">{{ p.date }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!filtered().length) {
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <p>No transactions found</p>
+      </div>
+    }
+  </div>
+</div>
