@@ -1,0 +1,1 @@
+import{f as a}from"./chunk-RL4NHS6Q.js";import"./chunk-H2TTHWFA.js";import{Ga as n,Za as o}from"./chunk-5GZ4X3RF.js";var m=class e{static \u0275fac=function(t){return new(t||e)};static \u0275cmp=n({type:e,selectors:[["app-admin-auth-layout"]],decls:1,vars:0,template:function(t,u){t&1&&o(0,"router-outlet")},dependencies:[a],encapsulation:2})};export{m as AdminAuthLayoutComponent};
